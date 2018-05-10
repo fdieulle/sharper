@@ -1,0 +1,15 @@
+Package: sharper
+Version: 0.1
+Date: 2018-05-10
+Title: R interoperability with .Net Core and .Net Framework
+Authors@R: c(
+	person("Fabien Dieulle", "Developer", role = c("aut", "cre"), email = "fabien.dieulle@gmail.com")
+	)
+Author: Fabien Dieulle Developer [aut, cre],
+Maintainer: Fabien Dieulle Developer <fabien.dieulle@gmail.com>
+Depends: R (>= 3.1.0)
+Description: R package which provides interoperability with .Net Core and .Net Framework
+	it may usefull when you want to run .Net code into a R environment.
+License: MIT
+URL: https://github.com/fdieulle/Sharper
+BugReports: https://github.com/fdieulle/Sharper
