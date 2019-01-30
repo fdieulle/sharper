@@ -21,22 +21,38 @@ namespace Sharper.Tests
             ClrProxy.DataConverter = Substitute.For<IDataConverter>();
             Assert.IsNotNull(ClrProxy.LoadAssembly(PATH));
 
-            var typeName = "AssemblyForTests.StaticClass";
-            var methodName = "SameMethodName";
+            const string typeName = "AssemblyForTests.StaticClass";
+            const string methodName = "SameMethodName";
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
             ClrProxy.CallStaticMethod(typeName, methodName, null, 0);
             
-            Assert.IsTrue(typeName.TryGetType(out var type, out var errorMsg));
+            typeName.TryGetType(out var type, out var errorMessage).CheckIsTrue();
+            errorMessage.CheckIsNull();
             
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<int>()), out var method1));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<double>()), out var method2));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<int[]>()), out var method3));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<double[]>()), out var method4));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<double>(), C<int>()), out var method5));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<double[]>(), C<int[]>()), out var method6));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<double[]>(), C<int>()), out var method7));
-            Assert.IsTrue(type.TryGetMethod(methodName, flags, A(C<double>(), C<int[]>()), out var method8));
+            type.TryGetMethod(methodName, flags, A(C<int>()), out var method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<double>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<int[]>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<double[]>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<double>(), C<int>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<double[]>(), C<int[]>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<double[]>(), C<int>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
+
+            type.TryGetMethod(methodName, flags, A(C<double>(), C<int[]>()), out method).CheckIsTrue();
+            method.CheckIsNotNull();
         }
 
         private static IConverter C(Type type)
