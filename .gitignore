@@ -34,3 +34,8 @@ vignettes/*.pdf
 .vs
 [Bb]in
 [Oo]bj
+inst
+/src/ClrHost/ClrHost.vcxproj.user
+[dD]ebug
+[rR]elease
+/src/ClrHost/libs
