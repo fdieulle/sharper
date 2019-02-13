@@ -19,13 +19,13 @@ namespace Sharper.Tests
         public void TestGetMethod()
         {
             ClrProxy.DataConverter = Substitute.For<IDataConverter>();
-            Assert.IsNotNull(ClrProxy.LoadAssembly(PATH));
+            ClrProxy.LoadAssembly(PATH);
 
             const string typeName = "AssemblyForTests.StaticClass";
             const string methodName = "SameMethodName";
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
-            ClrProxy.CallStaticMethod(typeName, methodName, null, 0);
+            ClrProxy.CallStaticMethod(typeName, methodName, null, 0, out var results, out var resultsSize);
             
             typeName.TryGetType(out var type, out var errorMessage).CheckIsTrue();
             errorMessage.CheckIsNull();

@@ -2,7 +2,9 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using RDotNet;
 using Sharper.Converters;
+using Sharper.Converters.RDotNet;
 using Sharper.Loggers;
 
 namespace Sharper
@@ -11,18 +13,28 @@ namespace Sharper
     {
         private static readonly ILogger logger = new FileLogger(Assembly.GetExecutingAssembly().Location);
 
+        static ClrProxy()
+        {
+            AppDomain.CurrentDomain.UnhandledException += OnException;
+        }
+
+        private static void OnException(object sender, UnhandledExceptionEventArgs e)
+        {
+            logger.Error("Unhandled exception", e.ExceptionObject as Exception);
+        }
+
         #region Mange Data converter
 
-        public static IDataConverter DataConverter { get; set; }
+        public static IDataConverter DataConverter { get; set; } = new RDotNetConverter();
 
         #endregion
 
-        public static Assembly LoadAssembly([MarshalAs(UnmanagedType.LPStr)] string pathOrAssemblyName)
+        public static void LoadAssembly([MarshalAs(UnmanagedType.LPStr)] string pathOrAssemblyName)
         {
             logger.InfoFormat("[LoadAssembly] Path or AssemblyName: {0}", pathOrAssemblyName);
 
             if (string.IsNullOrEmpty(pathOrAssemblyName))
-                return null;
+                return;
 
             try
             {
@@ -33,14 +45,18 @@ namespace Sharper
                     foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                     {
                         if (string.Equals(assembly.ManifestModule.Name, assemblyName))
-                            return assembly;
+                            return;
                     }
 
-                    return Assembly.LoadFrom(filePath);
+                    Assembly.LoadFrom(filePath);
+                    return;
                 }
 
                 if (pathOrAssemblyName.IsFullyQualifiedAssemblyName())
-                    return Assembly.Load(pathOrAssemblyName);
+                {
+                    Assembly.Load(pathOrAssemblyName);
+                    return;
+                }
 
                 throw new FileLoadException($"Unable to load assembly: {pathOrAssemblyName}");
             }
@@ -51,12 +67,13 @@ namespace Sharper
             }
         }
 
-        [return: MarshalAs(UnmanagedType.IUnknown)]
-        public static object CallStaticMethod(
+        public static void CallStaticMethod(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
-            int argumentsSize)
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ulong[] argumentsPtr,
+            int argumentsSize,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)] out ulong[] results,
+            [Out] out int resultsSize)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
@@ -75,7 +92,9 @@ namespace Sharper
                     throw new MissingMethodException($"Method not found, Type: {typeName}, Method: {methodName}");
 
                 var result = method.Call(null, converters);
-                return DataConverter.ConvertBack(method.ReturnType, result);
+                var symbols = DataConverter.ConvertBack(method.ReturnType, result);
+                results = new[] {(ulong)symbols};
+                resultsSize = 1;
             }
             catch (Exception e)
             {
@@ -115,7 +134,7 @@ namespace Sharper
         public static void SetStaticProperty(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
-            [MarshalAs(UnmanagedType.I8)] long argumentPtr)
+            [MarshalAs(UnmanagedType.I8)] ulong argumentPtr)
         {
             logger.DebugFormat("[SetStaticProperty] TypeName: {0}, PropertyName: {1}", typeName, propertyName);
 
@@ -144,7 +163,7 @@ namespace Sharper
         [return: MarshalAs(UnmanagedType.IUnknown)]
         public static object CreateObject(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] long[] argumentsPtr,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] ulong[] argumentsPtr,
             int argumentsSize)
         {
             logger.DebugFormat("[CreateInstance] TypeName: {0}", typeName);
@@ -175,7 +194,7 @@ namespace Sharper
         public static object CallMethod(
             [MarshalAs(UnmanagedType.AsAny)] object instance,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ulong[] argumentsPtr,
             int argumentsSize)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
@@ -242,7 +261,7 @@ namespace Sharper
         public static void SetProperty(
             object instance, 
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
-            [MarshalAs(UnmanagedType.I8)] long argumentPtr)
+            [MarshalAs(UnmanagedType.I8)] ulong argumentPtr)
         {
             logger.DebugFormat("[SetProperty] Instance: {0}, PropertyName: {1}", instance, propertyName);
 

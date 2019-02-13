@@ -13,7 +13,7 @@ extern "C" {
 	void rStartClr(char** appBaseDir, char** dotnetcorePath);
 	void rShutdownClr();
 
-	void rLoadAssembly(SEXP fileName);
+	void rLoadAssembly(char** fileName);
 
 	// Proxy methods
 	SEXP rCallStaticMethod(SEXP p);

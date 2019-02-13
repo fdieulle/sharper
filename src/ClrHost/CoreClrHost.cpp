@@ -176,15 +176,15 @@ void CoreClrHost::loadAssembly(const char * filePath)
 	_loadAssemblyFunc(filePath);
 }
 
-int64_t CoreClrHost::callStaticMethod(const char * typeName, const char * methodName, int64_t argsPtr[], int32_t size)
+void CoreClrHost::callStaticMethod(const char* typeName, const char* methodName, uint64_t* args, int32_t argsSize, uint64_t** results, int32_t* resultsSize)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return 0;
+		return;
 	}
 
-	return _callStaticMethodFunc(typeName, methodName, argsPtr, size);
+	_callStaticMethodFunc(typeName, methodName, args, argsSize, results, resultsSize);
 }
 
 void CoreClrHost::releaseObject(int64_t ptr)

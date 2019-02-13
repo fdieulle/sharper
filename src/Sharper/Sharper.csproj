@@ -8,4 +8,12 @@
     <Exec Command="xcopy $(OutDir)** $(SolutionDir)..\inst\libs /I /Y" />
   </Target>
 
+  <ItemGroup>
+    <PackageReference Include="DynamicInterop" Version="0.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dependencies\rdotnet\R.NET\R.Net.csproj" />
+  </ItemGroup>
+
 </Project>

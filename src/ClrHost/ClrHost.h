@@ -30,7 +30,7 @@ public:
 	virtual void start(const char* appBaseDir, const char* dotnetcorePath) = 0;
 	virtual void shutdown() = 0;
 
-	void rloadAssembly(SEXP p);
+	void rloadAssembly(char** filePath);
 
 	SEXP rCallStaticMethod(SEXP p);
 	SEXP rGetStatic(SEXP p);
@@ -44,13 +44,13 @@ protected:
 	uint32_t _domainId;
 
 	virtual void loadAssembly(const char* filePath) = 0;
-	virtual long long callStaticMethod(const char* typeName, const char* methodName, int64_t argsPtr[], int32_t size) = 0;
+	virtual void callStaticMethod(const char* typeName, const char* methodName, uint64_t* args, int32_t argsSize, uint64_t** results, int32_t* resultsSize) = 0;
 	virtual void releaseObject(int64_t ptr) = 0;
 private:
 
 	char* readStringFromSexp(SEXP p);
-	int64_t* readParametersFromSexp(SEXP p, int32_t& length);
-	SEXP convertToSEXP(int64_t ptr);
+	uint64_t* readParametersFromSexp(SEXP p, int32_t& length);
+	SEXP WrapResults(uint64_t* results, uint32_t length);
 	void clrObjectFinalizer(SEXP p);
 };
 

@@ -59,11 +59,11 @@ CORECLR_HOSTING_API(coreclr_execute_assembly,
 #endif
 
 
-//class ClrObject : IUnknown { };
+class ClrObject : IUnknown { };
 
 // Function pointer types for the managed call and callbacks
 typedef void(__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
-typedef int64_t(__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, int64_t argsPtr[], int32_t size);
+typedef void(__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, uint64_t* argsPtr, int32_t size, uint64_t** results, int32_t* resultsSize);
 //typedef ClrObject* (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName);
 //typedef void(__stdcall *setStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t argPtr);
 //typedef ClrObject* (__stdcall *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size);
@@ -84,7 +84,7 @@ public:
 
 protected:
 	virtual void loadAssembly(const char* filePath);
-	virtual long long callStaticMethod(const char* typeName, const char* methodName, int64_t argsPtr[], int32_t size);
+	virtual void callStaticMethod(const char* typeName, const char* methodName, uint64_t* args, int32_t argsSize, uint64_t** results, int32_t* resultsSize);
 	virtual void releaseObject(int64_t ptr);
 
 private:

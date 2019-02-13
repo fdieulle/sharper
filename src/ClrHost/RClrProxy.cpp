@@ -10,7 +10,7 @@ void rShutdownClr()
 	mainHost.shutdown();
 }
 
-void rLoadAssembly(SEXP filePath)
+void rLoadAssembly(char** filePath)
 {
 	mainHost.rloadAssembly(filePath);
 }
