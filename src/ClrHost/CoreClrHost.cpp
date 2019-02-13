@@ -139,6 +139,8 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 	// 5. Create delegates to managed code to be able to invoke them
 	createManagedDelegate("LoadAssembly", (void**)&_loadAssemblyFunc);
 	createManagedDelegate("CallStaticMethod", (void**)&_callStaticMethodFunc);
+	createManagedDelegate("GetStaticProperty", (void**)&_getStaticPropertyFunc);
+	createManagedDelegate("SetStaticProperty", (void**)&_setStaticPropertyFunc);
 }
 
 void CoreClrHost::shutdown()
@@ -185,6 +187,28 @@ void CoreClrHost::callStaticMethod(const char* typeName, const char* methodName,
 	}
 
 	_callStaticMethodFunc(typeName, methodName, args, argsSize, results, resultsSize);
+}
+
+uint64_t CoreClrHost::getStaticProperty(const char* typeName, const char* propertyName)
+{
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		Rf_error("CoreCLR isn't started.");
+		return 0;
+	}
+
+	return _getStaticPropertyFunc(typeName, propertyName);
+}
+
+void CoreClrHost::setStaticProperty(const char* typeName, const char* propertyName, uint64_t value)
+{
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		Rf_error("CoreCLR isn't started.");
+		return;
+	}
+
+	_setStaticPropertyFunc(typeName, propertyName, value);
 }
 
 void CoreClrHost::releaseObject(int64_t ptr)

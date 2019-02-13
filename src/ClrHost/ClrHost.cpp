@@ -11,11 +11,6 @@ ClrHost::~ClrHost()
 
 void ClrHost::rloadAssembly(char** filePath)
 {
-	// 1 - Get data from SEXP
-	//p = CDR(p); // Skip the first parameter because of function name
-	//const char* filePath = readStringFromSexp(p);
-
-	Rprintf("setp 2 %s\n", filePath[0]);
 	loadAssembly(filePath[0]);
 }
 
@@ -39,14 +34,40 @@ SEXP ClrHost::rCallStaticMethod(SEXP p)
 	return WrapResults(results, resultsSize);
 }
 
-SEXP ClrHost::rGetStatic(SEXP p)
+SEXP ClrHost::rGetStaticProperty(SEXP p)
 {
-	return SEXP();
+	// 1 - Get data from SEXP
+	p = CDR(p); // Skip the first parameter because of function name
+	const char* typeName = readStringFromSexp(p); p = CDR(p);
+	const char* propertyName = readStringFromSexp(p); p = CDR(p);
+
+	auto result = getStaticProperty(typeName, propertyName);
+
+	return WrapResult(result);
 }
 
-SEXP ClrHost::rSetStatic(SEXP p)
+SEXP ClrHost::rSetStaticProperty(SEXP p)
 {
-	return SEXP();
+	// 1 - Get data from SEXP
+	p = CDR(p); // Skip the first parameter because of function name
+	const char* typeName = readStringFromSexp(p); p = CDR(p);
+	const char* propertyName = readStringFromSexp(p); p = CDR(p);
+
+	int32_t argsSize = 0;
+	uint64_t* args = readParametersFromSexp(p, argsSize);
+
+	if (argsSize < 1)
+	{
+		Rf_error("Property value is missing\n");
+		return R_NilValue;
+	}
+
+	uint64_t result;
+	setStaticProperty(typeName, propertyName, args[0]);
+
+	delete[] args;
+
+	return WrapResult(result);
 }
 
 SEXP ClrHost::rCreateObject(SEXP p)
@@ -100,17 +121,21 @@ uint64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
 SEXP ClrHost::WrapResults(uint64_t* results, uint32_t length)
 {
 	auto list = Rf_allocVector(VECSXP, length);
-	for (auto i = 0; i < length; i++)
-	{
-		auto sexp = results[i] == 0 ? R_NilValue : (SEXP)results[i];
-		
-		//if (TYPEOF(sexp) == EXTPTRSXP)
-		//	R_RegisterCFinalizerEx(sexp, this->clrObjectFinalizer, (Rboolean)1);
 
-		SET_VECTOR_ELT(list, i, sexp);
-	}
+	for (auto i = 0; i < length; i++)
+		SET_VECTOR_ELT(list, i, WrapResult(results[i]));
 
 	return list;
+}
+
+SEXP ClrHost::WrapResult(uint64_t result)
+{
+	auto sexp = result == 0 ? R_NilValue : (SEXP)result;
+
+	//if (TYPEOF(sexp) == EXTPTRSXP)
+	//	R_RegisterCFinalizerEx(sexp, this->clrObjectFinalizer, (Rboolean)1);
+
+	return sexp;
 }
 
 void ClrHost::clrObjectFinalizer(SEXP p)

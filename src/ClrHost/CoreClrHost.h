@@ -62,10 +62,10 @@ CORECLR_HOSTING_API(coreclr_execute_assembly,
 class ClrObject : IUnknown { };
 
 // Function pointer types for the managed call and callbacks
-typedef void(__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
-typedef void(__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, uint64_t* argsPtr, int32_t size, uint64_t** results, int32_t* resultsSize);
-//typedef ClrObject* (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName);
-//typedef void(__stdcall *setStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t argPtr);
+typedef void (__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
+typedef void (__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, uint64_t* argsPtr, int32_t size, uint64_t** results, int32_t* resultsSize);
+typedef uint64_t (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName);
+typedef void (__stdcall *setStaticProperty_ptr)(const char* typeName, const char* propertyName, uint64_t value);
 //typedef ClrObject* (__stdcall *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size);
 //typedef void(__stdcall *releaseObject_ptr)(ClrObject* objPtr);
 //typedef ClrObject* (__stdcall *callMethod_ptr)(ClrObject* objPtr, const char* methodName, int64_t argsPtr[], int32_t size);
@@ -85,6 +85,9 @@ public:
 protected:
 	virtual void loadAssembly(const char* filePath);
 	virtual void callStaticMethod(const char* typeName, const char* methodName, uint64_t* args, int32_t argsSize, uint64_t** results, int32_t* resultsSize);
+	virtual uint64_t getStaticProperty(const char* typeName, const char* propertyName);
+	virtual void setStaticProperty(const char* typeName, const char* propertyName, uint64_t value);
+
 	virtual void releaseObject(int64_t ptr);
 
 private:
@@ -101,6 +104,8 @@ private:
 
 	loadAssembly_ptr _loadAssemblyFunc;
 	callStaticMethod_ptr _callStaticMethodFunc;
+	getStaticProperty_ptr _getStaticPropertyFunc;
+	setStaticProperty_ptr _setStaticPropertyFunc;
 
 	void BuildTpaList(const char* directory, const char* extension, std::string& tpaList);
 	void createManagedDelegate(const char* entryPointMethodName, void** delegate);

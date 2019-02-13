@@ -4,3 +4,5 @@ rStartClr
 rShutdownClr
 rLoadAssembly
 rCallStaticMethod
+rGetStaticProperty
+rSetStaticProperty

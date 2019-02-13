@@ -19,3 +19,13 @@ SEXP rCallStaticMethod(SEXP p)
 {
 	return mainHost.rCallStaticMethod(p);
 }
+
+SEXP rGetStaticProperty(SEXP p)
+{
+	return mainHost.rGetStaticProperty(p);
+}
+
+SEXP rSetStaticProperty(SEXP p)
+{
+	return mainHost.rSetStaticProperty(p);
+}
