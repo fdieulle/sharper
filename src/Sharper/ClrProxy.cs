@@ -24,7 +24,7 @@ namespace Sharper
 
         #region Mange Data converter
 
-        public static IDataConverter DataConverter { get; set; } = new RDotNetConverter();
+        public static IDataConverter DataConverter { get; set; } = new RDotNetConverter(logger);
 
         #endregion
 
@@ -69,9 +69,9 @@ namespace Sharper
         public static void CallStaticMethod(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ulong[] argumentsPtr,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
             int argumentsSize,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)] out ulong[] results,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)] out long[] results,
             [Out] out int resultsSize)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
@@ -92,7 +92,7 @@ namespace Sharper
 
                 var result = method.Call(null, converters);
                 var symbols = DataConverter.ConvertBack(method.ReturnType, result);
-                results = new[] {(ulong)symbols};
+                results = new[] {(long)symbols};
                 resultsSize = 1;
             }
             catch (Exception e)
@@ -103,7 +103,7 @@ namespace Sharper
         }
 
         [return: MarshalAs(UnmanagedType.U8)]
-        public static ulong GetStaticProperty(
+        public static long GetStaticProperty(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string propertyName)
         {
@@ -121,7 +121,7 @@ namespace Sharper
                     throw new InvalidOperationException($"Static property {propertyName} can't be get for Type: {type.FullName}");
 
                 var result = property.GetGetMethod().Call(null, new IConverter[0]);
-                return (ulong)DataConverter.ConvertBack(property.PropertyType, result);
+                return DataConverter.ConvertBack(property.PropertyType, result);
             }
             catch (Exception e)
             {
@@ -133,7 +133,7 @@ namespace Sharper
         public static void SetStaticProperty(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
-            [MarshalAs(UnmanagedType.U8)] ulong argumentPtr)
+            [MarshalAs(UnmanagedType.U8)] long argumentPtr)
         {
             logger.DebugFormat("[SetStaticProperty] TypeName: {0}, PropertyName: {1}", typeName, propertyName);
 
@@ -160,9 +160,9 @@ namespace Sharper
         }
 
         [return: MarshalAs(UnmanagedType.U8)]
-        public static ulong CreateObject(
+        public static long CreateObject(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] ulong[] argumentsPtr,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] long[] argumentsPtr,
             int argumentsSize)
         {
             logger.DebugFormat("[CreateInstance] TypeName: {0}", typeName);
@@ -180,7 +180,7 @@ namespace Sharper
                     throw new MissingMemberException($"Constructor not found for Type: {typeName}");
 
                 var result = ctor.Call(converters);
-                return (ulong)DataConverter.ConvertBack(type, result);
+                return DataConverter.ConvertBack(type, result);
             }
             catch (Exception e)
             {
@@ -192,9 +192,9 @@ namespace Sharper
         public static void CallMethod(
             [MarshalAs(UnmanagedType.AsAny)] object instance,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ulong[] argumentsPtr,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
             int argumentsSize,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)] out ulong[] results,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)] out long[] results,
             [Out] out int resultsSize)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
@@ -217,7 +217,7 @@ namespace Sharper
 
                 var result = method.Call(instance, converters);
                 var symbols = DataConverter.ConvertBack(method.ReturnType, result);
-                results = new[] { (ulong)symbols };
+                results = new[] { symbols };
                 resultsSize = 1;
             }
             catch (Exception e)
@@ -229,7 +229,7 @@ namespace Sharper
         }
 
         [return: MarshalAs(UnmanagedType.U8)]
-        public static ulong GetProperty(
+        public static long GetProperty(
             [MarshalAs(UnmanagedType.AsAny)] object instance,
             [MarshalAs(UnmanagedType.LPStr)] string propertyName)
         {
@@ -250,7 +250,7 @@ namespace Sharper
                     throw new InvalidOperationException($"Property {propertyName} can't be get for Type: {type.FullName}");
 
                 var result = property.GetGetMethod().Call(instance, new IConverter[0]);
-                return (ulong)DataConverter.ConvertBack(property.PropertyType, result);
+                return DataConverter.ConvertBack(property.PropertyType, result);
             }
             catch (Exception e)
             {
@@ -263,7 +263,7 @@ namespace Sharper
         public static void SetProperty(
             object instance, 
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
-            [MarshalAs(UnmanagedType.U8)] ulong argumentPtr)
+            [MarshalAs(UnmanagedType.U8)] long argumentPtr)
         {
             logger.DebugFormat("[SetProperty] Instance: {0}, PropertyName: {1}", instance, propertyName);
 

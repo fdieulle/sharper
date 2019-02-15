@@ -9,6 +9,14 @@
   </Target>
 
   <ItemGroup>
+    <None Remove="Converters\Resources\WindowsZones.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Converters\Resources\WindowsZones.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DynamicInterop" Version="0.9.1" />
   </ItemGroup>
 

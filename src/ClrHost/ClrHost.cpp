@@ -21,10 +21,10 @@ SEXP ClrHost::rCallStaticMethod(SEXP p)
 	const char* typeName = readStringFromSexp(p); p = CDR(p);
 	const char* methodName = readStringFromSexp(p); p = CDR(p);
 	int32_t argsSize = 0;
-	uint64_t* args = readParametersFromSexp(p, argsSize);
+	int64_t* args = readParametersFromSexp(p, argsSize);
 
 	// 2 - Call delegate on clr runtime
-	uint64_t* results;
+	int64_t* results;
 	int32_t resultsSize;
 	callStaticMethod(typeName, methodName, args, argsSize, &results, &resultsSize);
 
@@ -54,7 +54,7 @@ SEXP ClrHost::rSetStaticProperty(SEXP p)
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
 
 	int32_t argsSize = 0;
-	uint64_t* args = readParametersFromSexp(p, argsSize);
+	int64_t* args = readParametersFromSexp(p, argsSize);
 
 	if (argsSize < 1)
 	{
@@ -62,7 +62,7 @@ SEXP ClrHost::rSetStaticProperty(SEXP p)
 		return R_NilValue;
 	}
 
-	uint64_t result;
+	int64_t result;
 	setStaticProperty(typeName, propertyName, args[0]);
 
 	delete[] args;
@@ -99,26 +99,26 @@ char * ClrHost::readStringFromSexp(SEXP p)
 	return (char*)CHAR(STRING_ELT(e, 0));
 }
 
-uint64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
+int64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
 {
 	length = Rf_length(p);
 	if (length == 0) {
 		return NULL;
 	}
 
-	uint64_t* result = new uint64_t[length];
+	auto result = new int64_t[length];
 
 	int32_t i;
 	SEXP el;
 	for (i = 0; i < length && p != R_NilValue; i++, p = CDR(p)) {
 		el = CAR(p);
-		result[i] = (uint64_t)el;
+		result[i] = (int64_t)el;
 	}
 
 	return result;
 }
 
-SEXP ClrHost::WrapResults(uint64_t* results, uint32_t length)
+SEXP ClrHost::WrapResults(int64_t* results, uint32_t length)
 {
 	auto list = Rf_allocVector(VECSXP, length);
 
@@ -128,7 +128,7 @@ SEXP ClrHost::WrapResults(uint64_t* results, uint32_t length)
 	return list;
 }
 
-SEXP ClrHost::WrapResult(uint64_t result)
+SEXP ClrHost::WrapResult(int64_t result)
 {
 	auto sexp = result == 0 ? R_NilValue : (SEXP)result;
 

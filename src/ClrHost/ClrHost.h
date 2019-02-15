@@ -44,16 +44,16 @@ protected:
 	uint32_t _domainId;
 
 	virtual void loadAssembly(const char* filePath) = 0;
-	virtual void callStaticMethod(const char* typeName, const char* methodName, uint64_t* args, int32_t argsSize, uint64_t** results, int32_t* resultsSize) = 0;
-	virtual uint64_t getStaticProperty(const char* typeName, const char* propertyName) = 0;
-	virtual void setStaticProperty(const char* typeName, const char* propertyName, uint64_t value) = 0;
+	virtual void callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
+	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName) = 0;
+	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value) = 0;
 	virtual void releaseObject(int64_t ptr) = 0;
 private:
 
 	char* readStringFromSexp(SEXP p);
-	uint64_t* readParametersFromSexp(SEXP p, int32_t& length);
-	SEXP WrapResults(uint64_t* results, uint32_t length);
-	SEXP WrapResult(uint64_t result);
+	int64_t* readParametersFromSexp(SEXP p, int32_t& length);
+	SEXP WrapResults(int64_t* results, uint32_t length);
+	SEXP WrapResult(int64_t result);
 	void clrObjectFinalizer(SEXP p);
 };
 

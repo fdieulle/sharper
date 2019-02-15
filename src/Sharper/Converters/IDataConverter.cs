@@ -6,8 +6,8 @@ namespace Sharper.Converters
     {
         bool IsDefined(Type type);
 
-        IConverter GetConverter(ulong address);
+        IConverter GetConverter(long pointer);
 
-        IntPtr ConvertBack(Type type, object data);
+        long ConvertBack(Type type, object data);
     }
 }

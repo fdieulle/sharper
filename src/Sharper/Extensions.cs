@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -11,6 +12,8 @@ namespace Sharper
         #region Reflection
 
         #region Looking for types
+
+        private static readonly Type[] defaultTypeArray = { typeof(object) };
 
         public static bool TryGetType(this string typeName, out Type type, out string errorMsg)
         {
@@ -65,6 +68,144 @@ namespace Sharper
             errorMsg = $"Type {typeName} not found.";
             return false;
         }
+
+        public static Type[] GetFullHierarchy(this Type type)
+        {
+            if (type == null)
+                return defaultTypeArray;
+
+            var priorities = new Dictionary<Type, int>();
+            var queue = new Queue<Type>();
+            queue.Enqueue(type);
+            var priority = 0;
+            while (queue.Count != 0)
+            {
+                type = queue.Dequeue();
+
+                if (!priorities.ContainsKey(type))
+                    priorities.Add(type, priority++);
+
+                var interfaces = type.GetInterfaces();
+                var length = interfaces.Length;
+                for (var i = 0; i < length; i++)
+                {
+                    if (!priorities.ContainsKey(interfaces[i]))
+                        queue.Enqueue(interfaces[i]);
+
+                    priorities[interfaces[i]] = priority++;
+                }
+
+                if (type.BaseType != null)
+                    queue.Enqueue(type.BaseType);
+            }
+
+            if (!priorities.ContainsKey(typeof(object)))
+                priorities.Add(typeof(object), int.MaxValue);
+
+            return priorities.OrderBy(p => p.Value).Select(p => p.Key).ToArray();
+        }
+
+        public static Type[] Intersect(this Type[] x, Type[] y)
+        {
+            if (x == null || y == null)
+                return null;
+
+            var result = new List<Type>();
+
+            for (var i = 0; i < x.Length; i++)
+            {
+                for (var j = 0; j < y.Length; j++)
+                {
+                    if (x[i] == y[j])
+                        result.Add(x[i]);
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        public static Type[] Union(this Type[] x, Type[] y)
+        {
+            if (x == null)
+                return y;
+            if (y == null)
+                return x;
+
+            var result = new List<Type>();
+            var unique = new HashSet<Type>();
+            int i = 0, j = 0;
+            while (i < x.Length)
+            {
+                if (!unique.Contains(x[i]))
+                {
+                    for (var k = j; k < y.Length; k++)
+                    {
+                        if (x[i] == y[k])
+                        {
+                            for (; j < k; j++)
+                            {
+                                if (!unique.Contains(y[j]))
+                                {
+                                    result.Add(y[j]);
+                                    unique.Add(y[j]);
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    result.Add(x[i]);
+                    unique.Add(x[i]);
+                }
+
+                i++;
+            }
+
+            for (; j < y.Length; j++)
+            {
+                if (!unique.Contains(y[j]))
+                {
+                    result.Add(y[j]);
+                    unique.Add(y[j]);
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        public static List<Type> GetDictionaryTypes(this Type[] keyTypes, Type[] valueTypes)
+        {
+            if (keyTypes == null || valueTypes == null) return new List<Type>();
+
+            var result = new List<Type>(keyTypes.Length * valueTypes.Length);
+            for (var i = 0; i < keyTypes.Length; i++)
+            {
+                for (var j = 0; j < valueTypes.Length; j++)
+                {
+                    result.Add(typeof(Dictionary<,>)
+                        .MakeGenericType(keyTypes[i], valueTypes[j]));
+                }
+            }
+
+            return result;
+        }
+
+        public static List<Type> GetListOrArrayTypes(this Type[] valueTypes)
+        {
+            if (valueTypes == null) return new List<Type>();
+
+            var length = valueTypes.Length;
+            var result = new List<Type>(length * 2);
+            for (var i = 0; i < length; i++)
+            {
+                result.Add(valueTypes[i].MakeArrayType());
+                result.Add(typeof(List<>).MakeGenericType(new[] { valueTypes[i] }));
+            }
+            result.Add(typeof(Array));
+
+            return result;
+        }
+
 
         #endregion
 

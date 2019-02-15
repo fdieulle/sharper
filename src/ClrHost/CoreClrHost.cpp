@@ -178,7 +178,7 @@ void CoreClrHost::loadAssembly(const char * filePath)
 	_loadAssemblyFunc(filePath);
 }
 
-void CoreClrHost::callStaticMethod(const char* typeName, const char* methodName, uint64_t* args, int32_t argsSize, uint64_t** results, int32_t* resultsSize)
+void CoreClrHost::callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
@@ -189,7 +189,7 @@ void CoreClrHost::callStaticMethod(const char* typeName, const char* methodName,
 	_callStaticMethodFunc(typeName, methodName, args, argsSize, results, resultsSize);
 }
 
-uint64_t CoreClrHost::getStaticProperty(const char* typeName, const char* propertyName)
+int64_t CoreClrHost::getStaticProperty(const char* typeName, const char* propertyName)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
@@ -200,7 +200,7 @@ uint64_t CoreClrHost::getStaticProperty(const char* typeName, const char* proper
 	return _getStaticPropertyFunc(typeName, propertyName);
 }
 
-void CoreClrHost::setStaticProperty(const char* typeName, const char* propertyName, uint64_t value)
+void CoreClrHost::setStaticProperty(const char* typeName, const char* propertyName, int64_t value)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
