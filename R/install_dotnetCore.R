@@ -1,8 +1,8 @@
 #' @title
-#' Installs dotnet core.
+#' Install .Net core.
 #'
 #' @description
-#' Installs the dotnet core runtime on your machine. 
+#' Install the dotnet core runtime on your machine. 
 #' For more informations on this method see [dotnet-install-script](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script)
 #'
 #' @param channel Specifies the source channel for the installation. The possible values are:

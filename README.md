@@ -6,13 +6,13 @@ R package which allowing the use of .Net Core and .Net Framework from R as well 
 You can install the latest version of sharper from CRAN:
 
 ``` R
-install.packages("sharper") # to be tested
+install.packages("sharper") # Not available yet
 ```
 
 or the development version from GitHub using devtools:
 
 ``` R
-devtools::install_github("fdieulle/sharper") # to be tested
+devtools::install_github("fdieulle/sharper")
 ```
 
 then load the package
@@ -21,7 +21,7 @@ then load the package
 library(sharper)
 ```
 
-### .Net core
+### .Net Core
 
 You can install the latest .Net Core version for both environments `x86` and `x64` as follow:
 
