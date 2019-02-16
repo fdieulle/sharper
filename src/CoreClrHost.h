@@ -58,9 +58,6 @@ CORECLR_HOSTING_API(coreclr_execute_assembly,
 #endif
 #endif
 
-
-class ClrObject : IUnknown { };
-
 // Function pointer types for the managed call and callbacks
 typedef void (__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
 typedef void (__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, int64_t* argsPtr, int32_t size, int64_t** results, int32_t* resultsSize);

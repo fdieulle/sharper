@@ -3,24 +3,44 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharper", "Sharper\Sharper.csproj", "{9E2F0F55-6AC5-4B6F-B16B-14249C11DC75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharper", "src\dotnet\Sharper\Sharper.csproj", "{9E2F0F55-6AC5-4B6F-B16B-14249C11DC75}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8141B3DD-1A3E-4048-A92A-EFD1977BBC91}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharper.Tests", "..\tests\dotnet\Sharper.Tests\Sharper.Tests.csproj", "{6FBF6879-5F38-486A-A175-3AB693B7CA57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharper.Tests", "tests\dotnet\Sharper.Tests\Sharper.Tests.csproj", "{6FBF6879-5F38-486A-A175-3AB693B7CA57}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0107E144-B3D9-4DC9-8D7B-8728DB35B275} = {0107E144-B3D9-4DC9-8D7B-8728DB35B275}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyForTests", "..\tests\dotnet\AssemblyForTests\AssemblyForTests.csproj", "{0107E144-B3D9-4DC9-8D7B-8728DB35B275}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyForTests", "tests\dotnet\AssemblyForTests\AssemblyForTests.csproj", "{0107E144-B3D9-4DC9-8D7B-8728DB35B275}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClrHost", "ClrHost\ClrHost.vcxproj", "{2A5C9360-3A0A-45D4-890E-EB55E4AB5EE8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClrHost", "src\ClrHost.vcxproj", "{2A5C9360-3A0A-45D4-890E-EB55E4AB5EE8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{A8FA55E2-9CF3-40FB-9305-95B199C7B95F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R.Net", "Dependencies\rdotnet\R.NET\R.Net.csproj", "{8B0DC988-C85B-4E41-B851-C575835B0DBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R.Net", "src\dotnet\Dependencies\rdotnet\R.NET\R.Net.csproj", "{8B0DC988-C85B-4E41-B851-C575835B0DBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R.Net.NativeLibrary", "Dependencies\rdotnet\RDotNet.NativeLibrary\R.Net.NativeLibrary.csproj", "{F52F811B-3BEE-435F-A7CD-A961A507C7FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R.Net.NativeLibrary", "src\dotnet\Dependencies\rdotnet\RDotNet.NativeLibrary\R.Net.NativeLibrary.csproj", "{F52F811B-3BEE-435F-A7CD-A961A507C7FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{3E219373-D6C9-466F-AE6B-A7D82AF96A0D}"
+	ProjectSection(SolutionItems) = preProject
+		R\install_dotnetCore.R = R\install_dotnetCore.R
+		R\netCallStatic.R = R\netCallStatic.R
+		R\netLoadAssembly.R = R\netLoadAssembly.R
+		R\zzz.R = R\zzz.R
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F6B9212-DDB3-47B2-966B-59C1904A7A72}"
+	ProjectSection(SolutionItems) = preProject
+		Build.cmd = Build.cmd
+		DESCRIPTION = DESCRIPTION
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3B9A88A7-A027-43E2-B0B0-38DAE038044D}"
+	ProjectSection(SolutionItems) = preProject
+		src\install.libs.R = src\install.libs.R
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +133,7 @@ Global
 		{0107E144-B3D9-4DC9-8D7B-8728DB35B275} = {8141B3DD-1A3E-4048-A92A-EFD1977BBC91}
 		{8B0DC988-C85B-4E41-B851-C575835B0DBA} = {A8FA55E2-9CF3-40FB-9305-95B199C7B95F}
 		{F52F811B-3BEE-435F-A7CD-A961A507C7FE} = {A8FA55E2-9CF3-40FB-9305-95B199C7B95F}
+		{3B9A88A7-A027-43E2-B0B0-38DAE038044D} = {0F6B9212-DDB3-47B2-966B-59C1904A7A72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A316C57-C570-467C-AA2E-B685B4C29D78}

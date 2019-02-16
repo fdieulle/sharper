@@ -70,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Platform)'=='Win32'">
-    <OutDir>$(SolutionDir)..\inst\libs\i386\</OutDir>
+    <OutDir>$(SolutionDir)inst\bin\i386\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='x64'">
-    <OutDir>$(SolutionDir)..\inst\libs\x64\</OutDir>
+    <OutDir>$(SolutionDir)inst\bin\x64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(RHomePath)\include;$(IncludePath)</IncludePath>

@@ -2,6 +2,7 @@
 
 void rStartClr(char** appBaseDir, char** dotnetcorePath)
 {
+	Rprintf("Step 1");
 	mainHost.start(appBaseDir[0], dotnetcorePath[0]);
 }
 
@@ -25,7 +26,7 @@ SEXP rGetStaticProperty(SEXP p)
 	return mainHost.rGetStaticProperty(p);
 }
 
-SEXP rSetStaticProperty(SEXP p)
+void rSetStaticProperty(SEXP p)
 {
-	return mainHost.rSetStaticProperty(p);
+	mainHost.rSetStaticProperty(p);
 }

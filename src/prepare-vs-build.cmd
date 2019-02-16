@@ -7,7 +7,7 @@ SET VS_VC_BUILD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professiona
 
 REM Prepare VS project for x86
 
-SET OUT_DIR=%CUR_DIR%\ClrHost\libs\x86
+SET OUT_DIR=%CUR_DIR%\libs\x86
 IF NOT EXIST %OUT_DIR% mkdir %OUT_DIR%
 
 REM Generate R.def export file from R.dll library
@@ -19,7 +19,7 @@ call lib /nologo /def:%OUT_DIR%\R.def /out:%OUT_DIR%\rdll.lib /machine:x86
 
 REM Prepare VS project for x64
 
-SET OUT_DIR=%CUR_DIR%\ClrHost\libs\x64
+SET OUT_DIR=%CUR_DIR%\libs\x64
 IF NOT EXIST %OUT_DIR% mkdir %OUT_DIR%
 
 REM Generate R.def export file from R.dll library

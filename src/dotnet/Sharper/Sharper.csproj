@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy $(OutDir)** $(SolutionDir)..\inst\libs /I /Y" />
+    <Exec Command="xcopy $(OutDir)** $(SolutionDir)inst\bin /I /Y" />
   </Target>
 
   <ItemGroup>

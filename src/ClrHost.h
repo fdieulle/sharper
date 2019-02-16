@@ -2,6 +2,33 @@
 #define __CLR_HOST_H__
 
 #include <string>
+#include <stdint.h>
+
+
+// Check if its windows
+#ifdef _WIN32
+#define WINDOWS 1
+#define LINUX 0
+#define OSX 0
+#endif // _WIN32
+
+#ifdef _WIN64
+#define WINDOWS 1
+#define LINUX 0
+#define OSX 0
+#endif // _WIN64
+
+// Check if its MacOS
+#ifdef __APPLE__
+#define OSX = 1
+#define WINDOWS 0
+#endif // __APPLE__
+
+#if !WINDOWS
+#define LINUX 1
+#endif
+
+
 
 // Todo: Find a good way to isolate the target system preprocessor value than project properties. For now it's WINDOWS
 #if WINDOWS
@@ -34,7 +61,7 @@ public:
 
 	SEXP rCallStaticMethod(SEXP p);
 	SEXP rGetStaticProperty(SEXP p);
-	SEXP rSetStaticProperty(SEXP p);
+	void rSetStaticProperty(SEXP p);
 	SEXP rCreateObject(SEXP p);
 	SEXP rCall(SEXP p);
 	SEXP rGet(SEXP p);
@@ -52,7 +79,7 @@ private:
 
 	char* readStringFromSexp(SEXP p);
 	int64_t* readParametersFromSexp(SEXP p, int32_t& length);
-	SEXP WrapResults(int64_t* results, uint32_t length);
+	SEXP WrapResults(int64_t* results, int32_t length);
 	SEXP WrapResult(int64_t result);
 	void clrObjectFinalizer(SEXP p);
 };

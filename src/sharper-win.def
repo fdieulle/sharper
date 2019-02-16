@@ -1,0 +1,8 @@
+LIBRARY ClrHost.dll
+EXPORTS
+rStartClr
+rShutdownClr
+rLoadAssembly
+rCallStaticMethod
+rGetStaticProperty
+rSetStaticProperty

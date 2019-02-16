@@ -46,7 +46,7 @@ SEXP ClrHost::rGetStaticProperty(SEXP p)
 	return WrapResult(result);
 }
 
-SEXP ClrHost::rSetStaticProperty(SEXP p)
+void ClrHost::rSetStaticProperty(SEXP p)
 {
 	// 1 - Get data from SEXP
 	p = CDR(p); // Skip the first parameter because of function name
@@ -59,15 +59,12 @@ SEXP ClrHost::rSetStaticProperty(SEXP p)
 	if (argsSize < 1)
 	{
 		Rf_error("Property value is missing\n");
-		return R_NilValue;
+		return;
 	}
 
-	int64_t result;
 	setStaticProperty(typeName, propertyName, args[0]);
 
 	delete[] args;
-
-	return WrapResult(result);
 }
 
 SEXP ClrHost::rCreateObject(SEXP p)
@@ -118,7 +115,7 @@ int64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
 	return result;
 }
 
-SEXP ClrHost::WrapResults(int64_t* results, uint32_t length)
+SEXP ClrHost::WrapResults(int64_t* results, int32_t length)
 {
 	auto list = Rf_allocVector(VECSXP, length);
 

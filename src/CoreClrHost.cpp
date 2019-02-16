@@ -12,6 +12,9 @@ CoreClrHost::~CoreClrHost()
 
 void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPath)
 {
+	Rprintf(appBaseDir);
+	Rprintf(dotnetcoreInstallPath);
+
 	// dotnet core default install folder
 	// Windows: C:\Program Files\dotnet\shared\Microsoft.NETCore.App
 	// Ubuntu or Alpine: /usr/share/dotnet/shared/Microsoft.NETCore.App/

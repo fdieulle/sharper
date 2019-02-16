@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Sharper\Sharper.csproj" />
+    <ProjectReference Include="..\..\..\src\dotnet\Sharper\Sharper.csproj" />
   </ItemGroup>
 
 </Project>

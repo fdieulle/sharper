@@ -39,3 +39,11 @@ inst
 [dD]ebug
 [rR]elease
 /src/ClrHost/libs
+/LICENSE
+/man
+/NAMESPACE
+/src-x64
+/src-i386
+*.o
+/src/libs
+/sharper_*.zip

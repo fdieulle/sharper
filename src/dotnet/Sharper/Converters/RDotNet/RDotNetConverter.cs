@@ -8,12 +8,18 @@ namespace Sharper.Converters.RDotNet
 {
     public class RDotNetConverter : IDataConverter
     {
-        private readonly ILogger _logger;
         private static readonly REngine engine = REngine.GetInstance(initialize: false);
 
+        static RDotNetConverter()
+        {
+            engine.Initialize(setupMainLoop: false);
+            engine.AutoPrint = false;
+        }
+
+        private readonly ILogger _logger;
         private readonly Dictionary<SymbolicExpressionType, Func<SymbolicExpression, IConverter>> _converters = new Dictionary<SymbolicExpressionType, Func<SymbolicExpression, IConverter>>();
         private readonly Dictionary<Type, Func<object, SymbolicExpression>> _convertersBack = new Dictionary<Type, Func<object, SymbolicExpression>>();
-
+        
         public RDotNetConverter(ILogger logger)
         {
             _logger = logger;

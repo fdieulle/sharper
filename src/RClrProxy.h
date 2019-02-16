@@ -18,7 +18,7 @@ extern "C" {
 	// Proxy methods
 	SEXP rCallStaticMethod(SEXP p);
 	SEXP rGetStaticProperty(SEXP p);
-	SEXP rSetStaticProperty(SEXP p);
+	void rSetStaticProperty(SEXP p);
 	//SEXP rCreateObject(SEXP p);
 	//SEXP rCall(SEXP p);
 	//SEXP rGet(SEXP p);
