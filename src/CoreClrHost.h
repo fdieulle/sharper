@@ -48,14 +48,10 @@ CORECLR_HOSTING_API(coreclr_execute_assembly,
 
 #if WINDOWS
 #define CORECLR_FILE_NAME "coreclr.dll"
-#elif LINUX
-#if OSX
-// For OSX, use Linux defines except that the CoreCLR runtime
-// library has a different name
+#elif OSX
 #define CORECLR_FILE_NAME "libcoreclr.dylib"
-#else
+#else 
 #define CORECLR_FILE_NAME "libcoreclr.so"
-#endif
 #endif
 
 // Function pointer types for the managed call and callbacks

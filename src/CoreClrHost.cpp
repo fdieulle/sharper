@@ -26,7 +26,7 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 		dotnetcoreInstallPath = "C:/Program Files/dotnet/shared/Microsoft.NETCore.App";
 #elif LINUX
 #if OSX
-		dotnetcoreInstallPath = "/usr/share/dotnet/shared/Microsoft.NETCore.App/";
+		dotnetcoreInstallPath = "/usr/local/share/dotnet/shared/Microsoft.NETCore.App/";
 #else
 		dotnetcoreInstallPath = "/usr/share/dotnet/shared/Microsoft.NETCore.App/";
 #endif
@@ -163,7 +163,7 @@ void CoreClrHost::shutdown()
 	if (!FreeLibrary(_coreClr))
 		Rf_error("Failed to free coreclr.dll\n");
 #elif LINUX
-	if (dlclose(coreClr))
+	if (dlclose(_coreClr))
 		Rf_error("Failed to free libcoreclr.so\n");
 #endif
 
@@ -269,7 +269,7 @@ void CoreClrHost::BuildTpaList(const char* directory, const char* extension, std
 		std::string filename(entry->d_name);
 
 		// Check if the file has the right extension
-		int extPos = filename.length() - extLength;
+		int extPos = filename.size() - extLength;
 		if (extPos <= 0 || filename.compare(extPos, extLength, extension) != 0)
 		{
 			continue;

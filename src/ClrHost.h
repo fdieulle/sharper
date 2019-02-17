@@ -20,7 +20,7 @@
 
 // Check if its MacOS
 #ifdef __APPLE__
-#define OSX = 1
+#define OSX 1
 #define WINDOWS 0
 #endif // __APPLE__
 
@@ -41,6 +41,7 @@
 #include <limits.h>
 #define FS_SEPERATOR "/"
 #define PATH_DELIMITER ":"
+#define MAX_PATH PATH_MAX
 #endif
 
 #include <R.h>
