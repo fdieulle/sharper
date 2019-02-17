@@ -24,12 +24,10 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 	{
 #if WINDOWS
 		dotnetcoreInstallPath = "C:/Program Files/dotnet/shared/Microsoft.NETCore.App";
-#elif LINUX
-#if OSX
+#elif OSX
 		dotnetcoreInstallPath = "/usr/local/share/dotnet/shared/Microsoft.NETCore.App/";
 #else
 		dotnetcoreInstallPath = "/usr/share/dotnet/shared/Microsoft.NETCore.App/";
-#endif
 #endif
 	}
 
