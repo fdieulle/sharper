@@ -52,5 +52,45 @@ namespace AssemblyForTests
         }
 
         #endregion
+
+        #region Returns Native types
+
+        public static int ReturnsNativeType(int x) => x;
+        public static int[] ReturnsNativeType(int[] x) => x;
+        public static int[,] ReturnsNativeType(int[,] x) => x;
+
+        public static double ReturnsNativeType(double x) => x;
+        public static double[] ReturnsNativeType(double[] x) => x;
+        public static double[,] ReturnsNativeType(double[,] x) => x;
+
+        public static bool ReturnsNativeType(bool x) => x;
+        public static bool[] ReturnsNativeType(bool[] x) => x;
+        public static bool[,] ReturnsNativeType(bool[,] x) => x;
+
+        public static string ReturnsNativeType(string x) => x;
+        public static string[] ReturnsNativeType(string[] x) => x;
+        public static string[,] ReturnsNativeType(string[,] x) => x;
+
+        public static DateTime ReturnsNativeType(DateTime x) => x;
+        public static DateTime[] ReturnsNativeType(DateTime[] x) => x;
+        public static DateTime[,] ReturnsNativeType(DateTime[,] x) => x;
+
+        public static TimeSpan ReturnsNativeType(TimeSpan x) => x;
+        public static TimeSpan[] ReturnsNativeType(TimeSpan[] x) => x;
+        public static TimeSpan[,] ReturnsNativeType(TimeSpan[,] x) => x;
+
+        #endregion
+
+        #region Properties
+
+        public static double DoubleProperty { get; set; } = 12.3;
+
+        public static double[] DoubleArrayProperty { get; set; } = { 12.3, 13.4, 14.5 };
+
+        public static int Int32Property { get; set; } = 13;
+
+        public static int[] Int32ArrayProperty { get; set; } = { 12, 13, 14 };
+
+        #endregion
     }
 }

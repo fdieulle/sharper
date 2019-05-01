@@ -26,7 +26,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{3E219373-D6C9-46
 	ProjectSection(SolutionItems) = preProject
 		R\install_dotnetCore.R = R\install_dotnetCore.R
 		R\netCallStatic.R = R\netCallStatic.R
+		R\netGetStatic.R = R\netGetStatic.R
 		R\netLoadAssembly.R = R\netLoadAssembly.R
+		R\netSetStatic.R = R\netSetStatic.R
 		R\zzz.R = R\zzz.R
 	EndProjectSection
 EndProject
@@ -40,6 +42,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3B9A88A7-A027-43E2-B0B0-38DAE038044D}"
 	ProjectSection(SolutionItems) = preProject
 		src\install.libs.R = src\install.libs.R
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{96F37B24-3C80-4AFD-B0D8-A6EF64F07A11}"
+	ProjectSection(SolutionItems) = preProject
+		tests\testthat.R = tests\testthat.R
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testthat", "testthat", "{B955122F-D7A9-4BE1-8A6C-CA930D19F1D5}"
+	ProjectSection(SolutionItems) = preProject
+		tests\testthat\test-callStaticMethod.R = tests\testthat\test-callStaticMethod.R
 	EndProjectSection
 EndProject
 Global
@@ -134,6 +146,8 @@ Global
 		{8B0DC988-C85B-4E41-B851-C575835B0DBA} = {A8FA55E2-9CF3-40FB-9305-95B199C7B95F}
 		{F52F811B-3BEE-435F-A7CD-A961A507C7FE} = {A8FA55E2-9CF3-40FB-9305-95B199C7B95F}
 		{3B9A88A7-A027-43E2-B0B0-38DAE038044D} = {0F6B9212-DDB3-47B2-966B-59C1904A7A72}
+		{96F37B24-3C80-4AFD-B0D8-A6EF64F07A11} = {8141B3DD-1A3E-4048-A92A-EFD1977BBC91}
+		{B955122F-D7A9-4BE1-8A6C-CA930D19F1D5} = {96F37B24-3C80-4AFD-B0D8-A6EF64F07A11}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A316C57-C570-467C-AA2E-B685B4C29D78}
