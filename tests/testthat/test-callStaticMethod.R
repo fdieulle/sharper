@@ -17,10 +17,12 @@ test_that("Call the same static method with different signatures", {
 	netCallStatic(typeName, methodName, c(1.24, 1.25), c(14L, 15L))
 })
 
-testCallStatic <- function(typeName, methodName, parameter) {
+testCallStatic <- function(typeName, methodName, parameter, expected = NULL) {
 	x <- netCallStatic(typeName, methodName, parameter)
 	expect_equal(class(x), class(parameter))
-	expect_equal(x, parameter)
+	if (is.null(expected))
+		expect_equal(x, parameter)
+	else expect_equal(x, expected)
 }
 
 test_that("Call static method for native types", {
@@ -46,6 +48,44 @@ test_that("Call static method for native types", {
 	testCallStatic(typeName, methodName, "Hello")
 	testCallStatic(typeName, methodName, c("Hello", "dotnet", "It' R"))
 	# Not supported testCallStatic(typeName, methodName, matrix(nrow = 7, ncol = 3, data = "Hello"))
+
+	# Difftime
+	t1 <- as.POSIXct("2019-03-20 10:32:21")
+	t2 <- as.POSIXct("2019-04-20 10:42:00")
+	expected <- difftime(t2, t1, units = "secs")
+	
+	testCallStatic(typeName, methodName, difftime(t2, t1, units = "auto"), expected)
+	testCallStatic(typeName, methodName, difftime(t2, t1, units = "secs"), expected)
+	testCallStatic(typeName, methodName, difftime(t2, t1, units = "mins"), expected)
+	testCallStatic(typeName, methodName, difftime(t2, t1, units = "hours"), expected)
+	testCallStatic(typeName, methodName, difftime(t2, t1, units = "days"), expected)
+	testCallStatic(typeName, methodName, difftime(t2, t1, units = "weeks"), expected)
+
+	x <- seq(Sys.time(), by = '10 min', length = 10)
+	expected <- difftime(head(x, -1), tail(x, -1), units = "secs")
+	
+	testCallStatic(typeName, methodName, difftime(head(x, -1), tail(x, -1), units = "auto"), expected)
+	testCallStatic(typeName, methodName, difftime(head(x, -1), tail(x, -1), units = "secs"), expected)
+	testCallStatic(typeName, methodName, difftime(head(x, -1), tail(x, -1), units = "mins"), expected)
+	testCallStatic(typeName, methodName, difftime(head(x, -1), tail(x, -1), units = "hours"), expected)
+	testCallStatic(typeName, methodName, difftime(head(x, -1), tail(x, -1), units = "days"), expected)
+	testCallStatic(typeName, methodName, difftime(head(x, -1), tail(x, -1), units = "weeks"), expected)
+
+	x <- seq(Sys.time(), by = '10 min', length = 16)
+	expected <- as.difftime(matrix(nrow = 3, ncol = 5, data = difftime(head(x, -1), tail(x, -1))), units="mins")
+	units(expected) <- "secs"
+	input <- expected
+	
+	units(input) <- "secs"
+	testCallStatic(typeName, methodName, input, expected)
+	units(input) <- "mins"
+	testCallStatic(typeName, methodName, input, expected)
+	units(input) <- "hours"
+	testCallStatic(typeName, methodName, input, expected)
+	units(input) <- "days"
+	testCallStatic(typeName, methodName, input, expected)
+	units(input) <- "weeks"
+	testCallStatic(typeName, methodName, input, expected)
 })
 
 testTimezone <- function(timezone, convertedtimezone = NULL) {
