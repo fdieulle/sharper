@@ -1,0 +1,3 @@
+[submodule "src/dotnet/Dependencies/rdotnet"]
+	path = src/dotnet/Dependencies/rdotnet
+	url = https://github.com/rdotnet/rdotnet.git
