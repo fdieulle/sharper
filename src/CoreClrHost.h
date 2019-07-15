@@ -60,7 +60,7 @@ typedef void (__stdcall *callStaticMethod_ptr)(const char* typeName, const char*
 typedef int64_t (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName);
 typedef void (__stdcall *setStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t value);
 //typedef ClrObject* (__stdcall *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size);
-//typedef void(__stdcall *releaseObject_ptr)(ClrObject* objPtr);
+typedef void(__stdcall *releaseObject_ptr)(int64_t objPtr);
 //typedef ClrObject* (__stdcall *callMethod_ptr)(ClrObject* objPtr, const char* methodName, int64_t argsPtr[], int32_t size);
 //typedef ClrObject* (__stdcall *getMethod_ptr)(ClrObject* objPtr, const char* methodName);
 //typedef void(__stdcall *setMethod_ptr)(ClrObject* objPtr, const char* methodName, int64_t argPtr);
@@ -81,7 +81,7 @@ protected:
 	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName);
 	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value);
 
-	virtual void releaseObject(int64_t ptr);
+	virtual void registerFinalizer(SEXP sexp);
 
 private:
 #if WINDOWS
@@ -99,6 +99,7 @@ private:
 	callStaticMethod_ptr _callStaticMethodFunc;
 	getStaticProperty_ptr _getStaticPropertyFunc;
 	setStaticProperty_ptr _setStaticPropertyFunc;
+	static releaseObject_ptr releaseObjectFunc;
 
 	void BuildTpaList(const char* directory, const char* extension, std::string& tpaList);
 	void createManagedDelegate(const char* entryPointMethodName, void** delegate);

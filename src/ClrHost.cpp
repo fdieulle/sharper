@@ -129,13 +129,8 @@ SEXP ClrHost::WrapResult(int64_t result)
 {
 	auto sexp = result == 0 ? R_NilValue : (SEXP)result;
 
-	//if (TYPEOF(sexp) == EXTPTRSXP)
-	//	R_RegisterCFinalizerEx(sexp, this->clrObjectFinalizer, (Rboolean)1);
+	if (TYPEOF(sexp) == EXTPTRSXP)
+		registerFinalizer(sexp);
 
 	return sexp;
-}
-
-void ClrHost::clrObjectFinalizer(SEXP p)
-{
-	releaseObject((uint64_t)p);
 }

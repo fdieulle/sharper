@@ -1,5 +1,7 @@
 #include "CoreClrHost.h"
 
+releaseObject_ptr CoreClrHost::releaseObjectFunc;
+
 CoreClrHost::CoreClrHost()
 {
 }
@@ -142,6 +144,7 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 	createManagedDelegate("CallStaticMethod", (void**)&_callStaticMethodFunc);
 	createManagedDelegate("GetStaticProperty", (void**)&_getStaticPropertyFunc);
 	createManagedDelegate("SetStaticProperty", (void**)&_setStaticPropertyFunc);
+	createManagedDelegate("ReleaseObject", (void**)&(CoreClrHost::releaseObjectFunc));
 }
 
 void CoreClrHost::shutdown()
@@ -212,8 +215,9 @@ void CoreClrHost::setStaticProperty(const char* typeName, const char* propertyNa
 	_setStaticPropertyFunc(typeName, propertyName, value);
 }
 
-void CoreClrHost::releaseObject(int64_t ptr)
+void CoreClrHost::registerFinalizer(SEXP sexp)
 {
+	R_RegisterCFinalizerEx(sexp, [](SEXP p) { CoreClrHost::releaseObjectFunc((int64_t)p); }, (Rboolean)1);
 }
 
 void CoreClrHost::BuildTpaList(const char* directory, const char* extension, std::string& tpaList)

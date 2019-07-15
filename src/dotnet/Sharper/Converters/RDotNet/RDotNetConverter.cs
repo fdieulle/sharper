@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using RDotNet;
 using RDotNet.Internals;
 using Sharper.Loggers;
@@ -19,7 +20,8 @@ namespace Sharper.Converters.RDotNet
         private readonly ILogger _logger;
         private readonly Dictionary<SymbolicExpressionType, Func<SymbolicExpression, IConverter>> _converters = new Dictionary<SymbolicExpressionType, Func<SymbolicExpression, IConverter>>();
         private readonly Dictionary<Type, Func<object, SymbolicExpression>> _convertersBack = new Dictionary<Type, Func<object, SymbolicExpression>>();
-        
+        private readonly Dictionary<long, GCHandle> _sharedObjects = new Dictionary<long, GCHandle>();
+
         public RDotNetConverter(ILogger logger)
         {
             _logger = logger;
@@ -48,7 +50,28 @@ namespace Sharper.Converters.RDotNet
         public long ConvertBack(Type type, object data)
         {
             var sexp = ConvertToSexp(type, data);
-            return (long)(sexp?.DangerousGetHandle() ?? engine.NilValue.DangerousGetHandle());
+            if (sexp == null) return (long)engine.NilValue.DangerousGetHandle();
+
+            if (sexp.Type == SymbolicExpressionType.ExternalPointer)
+            {
+                var pointer = (long) sexp.DangerousGetHandle();
+                if (!_sharedObjects.TryGetValue(pointer, out var handle))
+                    _sharedObjects.Add(pointer, GCHandle.Alloc(data, GCHandleType.Pinned));
+                
+                return pointer;
+            }
+
+            return (long)sexp.DangerousGetHandle();
+        }
+
+        public void Release(long pointer)
+        {
+            if (_sharedObjects.TryGetValue(pointer, out var handle))
+            {
+                _sharedObjects.Remove(pointer);
+                if(handle.IsAllocated)
+                    handle.Free();
+            }
         }
 
         #endregion

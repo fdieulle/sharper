@@ -75,14 +75,13 @@ protected:
 	virtual void callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
 	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName) = 0;
 	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value) = 0;
-	virtual void releaseObject(int64_t ptr) = 0;
+	virtual void registerFinalizer(SEXP sexp) = 0;
 private:
 
 	char* readStringFromSexp(SEXP p);
 	int64_t* readParametersFromSexp(SEXP p, int32_t& length);
 	SEXP WrapResults(int64_t* results, int32_t length);
 	SEXP WrapResult(int64_t result);
-	void clrObjectFinalizer(SEXP p);
 };
 
 #endif // !__CLR_HOST_H__
