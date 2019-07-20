@@ -3,7 +3,10 @@
 
 #include <string>
 #include <stdint.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <vector>
+#include <algorithm>
 
 // Check if its windows
 #ifdef _WIN32
@@ -55,7 +58,7 @@ public:
 
 	uint32_t getDomainId() { return _domainId; }
 
-	virtual void start(const char* appBaseDir, const char* dotnetcorePath) = 0;
+	virtual void start(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path) = 0;
 	virtual void shutdown() = 0;
 
 	void rloadAssembly(char** filePath);
@@ -83,5 +86,21 @@ private:
 	SEXP WrapResults(int64_t* results, int32_t length);
 	SEXP WrapResult(int64_t result);
 };
+
+bool file_exists(const char* path);
+
+bool is_directory(const char* path);
+
+const char* path_combine(const char* path, const char* path2);
+
+const char* path_combine(const char* path, const char* path2, const char* path3);
+
+const char* path_expand(const char* path);
+
+void get_directories(const char* path, std::vector<std::string>& directories);
+
+const char* path_get_parent(const char* path);
+
+const char* first_or_default(char** value);
 
 #endif // !__CLR_HOST_H__

@@ -24,11 +24,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R.Net.NativeLibrary", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{3E219373-D6C9-466F-AE6B-A7D82AF96A0D}"
 	ProjectSection(SolutionItems) = preProject
-		R\install_dotnetCore.R = R\install_dotnetCore.R
+		R\install_dotnet_core.R = R\install_dotnet_core.R
 		R\netCallStatic.R = R\netCallStatic.R
 		R\netGetStatic.R = R\netGetStatic.R
 		R\netLoadAssembly.R = R\netLoadAssembly.R
 		R\netSetStatic.R = R\netSetStatic.R
+		R\start_clr.R = R\start_clr.R
 		R\zzz.R = R\zzz.R
 	EndProjectSection
 EndProject

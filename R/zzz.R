@@ -14,24 +14,10 @@
 	arch <- Sys.getenv('R_ARCH')
 	nativeLibPath <- file.path(libsPath, arch, libName)
 	
-	if (file.exists(nativeLibPath)) {
+	if (file.exists(nativeLibPath)) 
+	{
 		dyn.load(nativeLibPath)
-	
-		dotNetCorePath <- file.path(pkgDir, "bin", "dotnet-core")
-		if (arch == "/i386") {
-			dotNetCorePath <- file.path(dotNetCorePath, "x86")
-		} else if (arch == "/x64") {
-			dotNetCorePath <- file.path(dotNetCorePath, "x64")
-		} else return()
-
-		dotNetCorePath <- file.path(dotNetCorePath, "shared", "Microsoft.NETCore.App")
-
-		versions <- sort(list.dirs(dotNetCorePath, full.names = FALSE, recursive = FALSE), decreasing = FALSE)
-		if (length(versions) == 0) return()
-		
-		binPath <- file.path(pkgDir, "bin")
-
-		.C("rStartClr", file.path(pkgDir, "bin"), file.path(dotNetCorePath, versions[1]), PACKAGE = pkgname)
+		start_dotnet_core_clr()
 	}
 }
 

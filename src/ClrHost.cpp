@@ -41,7 +41,7 @@ SEXP ClrHost::rGetStaticProperty(SEXP p)
 	const char* typeName = readStringFromSexp(p); p = CDR(p);
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
 
-	auto result = getStaticProperty(typeName, propertyName);
+	int64_t result = getStaticProperty(typeName, propertyName);
 
 	return WrapResult(result);
 }
@@ -103,7 +103,7 @@ int64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
 		return NULL;
 	}
 
-	auto result = new int64_t[length];
+	int64_t* result = new int64_t[length];
 
 	int32_t i;
 	SEXP el;
@@ -117,9 +117,9 @@ int64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
 
 SEXP ClrHost::WrapResults(int64_t* results, int32_t length)
 {
-	auto list = Rf_allocVector(VECSXP, length);
+	SEXP list = Rf_allocVector(VECSXP, length);
 
-	for (auto i = 0; i < length; i++)
+	for (int32_t i = 0; i < length; i++)
 		SET_VECTOR_ELT(list, i, WrapResult(results[i]));
 
 	return list;
@@ -127,10 +127,107 @@ SEXP ClrHost::WrapResults(int64_t* results, int32_t length)
 
 SEXP ClrHost::WrapResult(int64_t result)
 {
-	auto sexp = result == 0 ? R_NilValue : (SEXP)result;
+	SEXP sexp = result == 0 ? R_NilValue : (SEXP)result;
 
 	if (TYPEOF(sexp) == EXTPTRSXP)
 		registerFinalizer(sexp);
 
 	return sexp;
+}
+
+bool file_exists(const char* path) {
+	if (path == NULL) return false;
+
+	FILE* f = std::fopen(path, "r");
+	if (NULL == f)
+		return false;
+
+	std::fclose(f);
+	return true;
+}
+
+bool is_directory(const char* path) {
+	if (path == NULL) return false;
+
+	struct stat info;
+
+	if (stat(path, &info) != 0)
+		return false; // Can't access to the path
+	if (info.st_mode & S_IFDIR)
+		return true;
+	return false;
+}
+
+const char* path_combine(const char* path, const char* path2) {
+	std::string combined(path);
+	combined.append(FS_SEPERATOR);
+	combined.append(path2);
+	return combined.c_str();
+}
+
+const char* path_combine(const char* path, const char* path2, const char* path3) {
+	std::string combined(path);
+	combined.append(FS_SEPERATOR);
+	combined.append(path2);
+	combined.append(FS_SEPERATOR);
+	combined.append(path3);
+	return combined.c_str();
+}
+
+const char* path_expand(const char* path) {
+	if (path == NULL) return path;
+
+	char expanded_path[MAX_PATH];
+#if WINDOWS
+	GetFullPathNameA(path, MAX_PATH, expanded_path, NULL);
+#elif LINUX
+	realpath(path, expanded_path);
+#endif
+	return std::string(expanded_path).c_str();
+}
+
+void get_directories(const char* path, std::vector<std::string>& directories) {
+	if (path == NULL || !is_directory(path)) return;
+
+#if WINDOWS
+	WIN32_FIND_DATAA findData;
+	HANDLE fileHandle = FindFirstFileA(path, &findData);
+
+	if (fileHandle != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			if (is_directory(path_combine(path, findData.cFileName)))
+				directories.push_back(findData.cFileName);
+
+		} while (FindNextFileA(fileHandle, &findData));
+		FindClose(fileHandle);
+	}
+#elif LINUX
+	DIR* dir = opendir(directory);
+	struct dirent* entry;
+	int extLength = strlen(extension);
+
+	while ((entry = readdir(dir)) != NULL)
+	{
+		if (is_directory(path_combine(path, entry->d_name)))
+		{
+			std::string filename(entry->d_name);
+			directories.push_back(filename);
+		}
+	}
+#endif
+}
+
+const char* path_get_parent(const char* path) {
+	std::string full_path(path);
+	std::size_t found = full_path.find_last_of("/\\");
+	if (found <= 0) return "..";
+
+	return full_path.substr(0, found).c_str();
+}
+
+const char* first_or_default(char** value) {
+	if (value == NULL) return NULL;
+	return value[0];
 }

@@ -1,9 +1,8 @@
 #include "RClrProxy.h"
 
-void rStartClr(char** appBaseDir, char** dotnetcorePath)
+void rStartClr(char** app_base_dir, char** package_bin_path, char** dotnet_core_path)
 {
-	Rprintf("Step 1");
-	mainHost.start(appBaseDir[0], dotnetcorePath[0]);
+	mainHost.start(first_or_default(app_base_dir), first_or_default(package_bin_path), first_or_default(dotnet_core_path));
 }
 
 void rShutdownClr()

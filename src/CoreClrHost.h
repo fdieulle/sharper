@@ -65,14 +65,13 @@ typedef void(__stdcall *releaseObject_ptr)(int64_t objPtr);
 //typedef ClrObject* (__stdcall *getMethod_ptr)(ClrObject* objPtr, const char* methodName);
 //typedef void(__stdcall *setMethod_ptr)(ClrObject* objPtr, const char* methodName, int64_t argPtr);
 
-
 class CoreClrHost : public ClrHost
 {
 public:
 	CoreClrHost();
 	~CoreClrHost();
 
-	virtual void start(const char* appBaseDir, const char* dotnetcorePath);
+	virtual void start(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path);
 	virtual void shutdown();
 
 protected:
@@ -101,8 +100,10 @@ private:
 	setStaticProperty_ptr _setStaticPropertyFunc;
 	static releaseObject_ptr releaseObjectFunc;
 
-	void BuildTpaList(const char* directory, const char* extension, std::string& tpaList);
 	void createManagedDelegate(const char* entryPointMethodName, void** delegate);
+
+	static const char* get_core_clr_with_tpa_list(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path, std::string& tpa_list);
+	static void build_tpa_list(const char* directory, const char* extension, std::string& tpaList);
 };
 
 #endif // !__CORECLR_HOST_H__

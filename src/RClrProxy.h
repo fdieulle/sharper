@@ -4,13 +4,13 @@
 #include "ClrHost.h"
 #include "CoreClrHost.h"
 
-CoreClrHost mainHost = CoreClrHost();
+static CoreClrHost mainHost = CoreClrHost();
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 	// ClrEnvironment methods
-	void rStartClr(char** appBaseDir, char** dotnetcorePath);
+	void rStartClr(char** app_base_dir, char** package_bin_path, char** dotnet_core_path);
 	void rShutdownClr();
 
 	void rLoadAssembly(char** fileName);

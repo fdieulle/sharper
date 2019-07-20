@@ -12,66 +12,42 @@ CoreClrHost::~CoreClrHost()
 }
 
 
-void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPath)
+void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path)
 {
-	Rprintf(appBaseDir);
-	Rprintf(dotnetcoreInstallPath);
-
-	// dotnet core default install folder
-	// Windows: C:\Program Files\dotnet\shared\Microsoft.NETCore.App
-	// Ubuntu or Alpine: /usr/share/dotnet/shared/Microsoft.NETCore.App/
-	// MacOS: /usr/local/share/dotnet/shared/Microsoft.NETCore.App/
-
-	if (dotnetcoreInstallPath == NULL)
-	{
-#if WINDOWS
-		dotnetcoreInstallPath = "C:/Program Files/dotnet/shared/Microsoft.NETCore.App";
-#elif OSX
-		dotnetcoreInstallPath = "/usr/local/share/dotnet/shared/Microsoft.NETCore.App/";
-#else
-		dotnetcoreInstallPath = "/usr/share/dotnet/shared/Microsoft.NETCore.App/";
-#endif
-	}
-
-	// Todo: Check if we found coreclr.dll other wise found the last dotnet core version 
-	// if it's not specified by user
+	Rprintf("app_base_dir: %s\n", app_base_dir);
+	Rprintf("package_bin_folder: %s\n", package_bin_folder);
+	Rprintf("dotnet_install_path: %s\n", dotnet_install_path);
 
 	if (_coreClr != NULL || _hostHandle != NULL)
 		shutdown();
 
-	char packagePath[MAX_PATH];
-	char dotnetCorePath[MAX_PATH];
-#if WINDOWS
-	GetFullPathNameA(appBaseDir, MAX_PATH, packagePath, NULL);
-	GetFullPathNameA(dotnetcoreInstallPath, MAX_PATH, dotnetCorePath, NULL);
-#elif LINUX
-	realpath(appBaseDir, packagePath);
-	realpath(dotnetcoreInstallPath, dotnetCorePath);
-#endif
+	if (app_base_dir == NULL) app_base_dir = ".";
+	app_base_dir = path_expand(app_base_dir);
 
-	Rprintf("AppBaseDir %s \n DotNetCorePath %s \n", packagePath, dotnetCorePath);
+	std::string tpa_list;
+	const char* core_clr_path = get_core_clr_with_tpa_list(app_base_dir, package_bin_folder, dotnet_install_path, tpa_list);
 
-	// Construct the CoreCLR path
-	// Todo: it may be necessary to probe for coreclr.dll/libcoreclr.so
-	std::string coreClrPath(dotnetCorePath);
-	coreClrPath.append(FS_SEPERATOR);
-	coreClrPath.append(CORECLR_FILE_NAME);
-
+	if (core_clr_path == NULL)
+	{
+		Rf_warning("Please install a dotnet core runtime version first.\nSee install_dotnet_core function.\n");
+		return;
+	}
+	
 	// 1. Load CoreCLR (coreclr.dll/libcoreclr.so)
 #if WINDOWS
-	_coreClr = LoadLibraryExA(coreClrPath.c_str(), NULL, 0);
+	_coreClr = LoadLibraryExA(core_clr_path, NULL, 0);
 #elif LINUX
-	_coreClr = dlopen(coreClrPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+	_coreClr = dlopen(core_clr_path, RTLD_NOW | RTLD_LOCAL);
 #endif
 
 	if (_coreClr == NULL)
 	{
-		Rf_error("Failed to load CoreCLR from %s\n", coreClrPath.c_str());
+		Rf_error("Failed to load CoreCLR from %s\n", core_clr_path);
 		return;
 	}
 	else
 	{
-		Rprintf("Loaded CoreCLR from %s\n", coreClrPath.c_str());
+		Rprintf("Loaded CoreCLR from %s\n", core_clr_path);
 	}
 
 	// 2. Get CoreCLR hosting functions
@@ -105,12 +81,6 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 
 	// 3. Construct properties used when starting the runtime
 
-	// Construct the trusted platform assemblies (TPA) list
-	// This is the list of assemblies that .NET Core can load as trusted system assemblies.
-	std::string tpaList;
-	BuildTpaList(dotnetCorePath, ".dll", tpaList);
-	BuildTpaList(packagePath, ".dll", tpaList);
-
 	// Define CoreCLR properties
 	// Other properties related to assembly loading are common here
 	const char* propertyKeys[] = {
@@ -118,12 +88,12 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 	};
 
 	const char* propertyValues[] = {
-		tpaList.c_str()
+		tpa_list.c_str()
 	};
 
 	// 4. Start the CoreCLR runtime and create the default (and only) AppDomain
-	auto hr = _initializeCoreClr(
-		packagePath,        // App base path
+	HRESULT hr = _initializeCoreClr(
+		app_base_dir,        // App base path
 		"CoreClrHost",       // AppDomain friendly name
 		sizeof(propertyKeys) / sizeof(char*),   // Property count
 		propertyKeys,       // Property names
@@ -149,7 +119,7 @@ void CoreClrHost::start(const char* appBaseDir, const char* dotnetcoreInstallPat
 
 void CoreClrHost::shutdown()
 {
-	auto hr = _shutdownCoreClr(_hostHandle, _domainId);
+	HRESULT hr = _shutdownCoreClr(_hostHandle, _domainId);
 
 	if (hr >= 0)
 	{
@@ -220,7 +190,7 @@ void CoreClrHost::registerFinalizer(SEXP sexp)
 	R_RegisterCFinalizerEx(sexp, [](SEXP p) { CoreClrHost::releaseObjectFunc((int64_t)p); }, (Rboolean)1);
 }
 
-void CoreClrHost::BuildTpaList(const char* directory, const char* extension, std::string& tpaList)
+/*static*/ void CoreClrHost::build_tpa_list(const char* directory, const char* extension, std::string& tpaList)
 {
 #if WINDOWS
 	// Win32 directory search for .dll files
@@ -296,7 +266,7 @@ void CoreClrHost::BuildTpaList(const char* directory, const char* extension, std
 
 void CoreClrHost::createManagedDelegate(const char* entryPointMethodName, void** delegate)
 {
-	auto hr = _createManagedDelegate(
+	HRESULT hr = _createManagedDelegate(
 		_hostHandle,
 		_domainId,
 		"Sharper",
@@ -304,8 +274,138 @@ void CoreClrHost::createManagedDelegate(const char* entryPointMethodName, void**
 		entryPointMethodName,
 		delegate);
 
-	if (hr >= 0)
-		Rprintf("Managed delegate created for %s function\n", entryPointMethodName);
-	else
+	if (hr < 0)
 		Rf_error("coreclr_create_delegate for method %s failed - status: %d\n", entryPointMethodName, hr);
 }
+
+struct version_t {
+	version_t() : version_t(-1, -1, -1, -1) { }
+	version_t(int major, int minor, int build, int revision)
+		: m_major(major), m_minor(minor), m_build(build), m_revision(revision) { }
+
+	int get_major() const { return m_major; }
+	int get_minor() const { return m_minor; }
+	int get_build() const { return m_build; }
+	int get_revision() const { return m_revision; }
+
+	void set_major(int m) { m_major = m; }
+	void set_minor(int m) { m_minor = m; }
+	void set_build(int m) { m_build = m; }
+	void set_revision(int m) { m_revision = m; }
+
+	bool operator ==(const version_t& b) const { return compare(*this, b) == 0; }
+	bool operator !=(const version_t& b) const { return !operator ==(b); }
+	bool operator <(const version_t& b) const { return compare(*this, b) < 0; }
+	bool operator >(const version_t& b) const { return compare(*this, b) > 0; }
+	bool operator <=(const version_t& b) const { return compare(*this, b) <= 0; }
+	bool operator >=(const version_t& b) const { return compare(*this, b) >= 0; }
+
+	std::string as_str() const {
+		std::string version;
+		if (m_major >= 0)
+		{
+			version.append(std::to_string(m_major));
+			if (m_minor >= 0)
+			{
+				version.append(std::to_string(m_minor));
+				if (m_build >= 0)
+				{
+					version.append(std::to_string(m_build));
+					if (m_revision >= 0)
+						version.append(std::to_string(m_revision));
+				}
+			}
+		}
+
+		return version;
+	}
+
+	static bool parse(const std::string& version, version_t* version_out) {
+		
+		if (version.empty()) return false;
+
+		size_t start = 0;
+		int major = parse_next(version, &start);
+		int minor = parse_next(version, &start);
+		int build = parse_next(version, &start);
+		int revision = parse_next(version, &start);
+		
+		*version_out = version_t(major, minor, build, revision);
+
+		return true;
+	}
+
+private:
+	int m_major;
+	int m_minor;
+	int m_build;
+	int m_revision;
+
+	static int compare(const version_t&a, const version_t& b) {
+		if (a.m_major != b.m_major)
+			return (a.m_major > b.m_major) ? 1 : -1;
+
+		if (a.m_minor != b.m_minor)
+			return (a.m_minor > b.m_minor) ? 1 : -1;
+
+		if (a.m_build != b.m_build)
+			return (a.m_build > b.m_build) ? 1 : -1;
+
+		if (a.m_revision != b.m_revision)
+			return (a.m_revision > b.m_revision) ? 1 : -1;
+
+		return 0;
+	}
+
+	static int parse_next(const std::string& version, size_t* offset) {
+		if (version.size() - *offset <= 0) return -1;
+
+		size_t start = *offset;
+		size_t length = version.find('.', start);
+		*offset = start + length;
+		if (length == std::string::npos)
+			return std::stoi(version.substr(start));
+
+		*offset = (*offset) + 1;
+		return std::stoi(version.substr(start, length));
+	}
+};
+
+/*static*/ const char* CoreClrHost::get_core_clr_with_tpa_list(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path, std::string& tpa_list) {
+	
+	if (is_directory(package_bin_folder))
+		CoreClrHost::build_tpa_list(package_bin_folder, ".dll", tpa_list);
+
+	dotnet_install_path = path_expand(dotnet_install_path);
+
+	// If the given path is a file we get the parent folder
+	if (!is_directory(app_base_dir) && file_exists(app_base_dir))
+		app_base_dir = path_get_parent(app_base_dir);
+	
+	app_base_dir = path_expand(app_base_dir);
+
+	if (is_directory(app_base_dir))
+	{
+		CoreClrHost::build_tpa_list(app_base_dir, ".dll", tpa_list);
+		CoreClrHost::build_tpa_list(app_base_dir, ".exe", tpa_list);
+
+		// Check if the app_base_dir is self contained
+		const char* core_clr = path_combine(app_base_dir, CORECLR_FILE_NAME);
+		if (file_exists(core_clr))
+			return core_clr;
+	}
+	
+	// Load the dotnet core dlls.
+	if (is_directory(dotnet_install_path))
+	{
+		const char* core_clr = path_combine(dotnet_install_path, CORECLR_FILE_NAME);
+		if (file_exists(core_clr))
+		{
+			CoreClrHost::build_tpa_list(dotnet_install_path, ".dll", tpa_list);
+			return core_clr;
+		}
+	}
+
+	return NULL;
+}
+

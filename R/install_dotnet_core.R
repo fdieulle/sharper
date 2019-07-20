@@ -28,10 +28,10 @@
 #' \dontrun{
 #' library(sharper)
 #'
-#' install_dotnetCore()
-#' install_dotnetCore(installDir = "./", runtime = "aspnetcore")
+#' install_dotnet_core()
+#' install_dotnet_core(installDir = "./", runtime = "aspnetcore")
 #' }
-install_dotnetCore <- function(channel = "LTS", version = "latest", installDir = NULL, architecture = NULL, runtime = "dotnet") {
+install_dotnet_core <- function(channel = "LTS", version = "latest", installDir = NULL, architecture = NULL, runtime = "dotnet") {
 	pkgFolder <- system.file(package = "sharper")
 	
 	binFolder <- file.path(pkgFolder, "bin")
@@ -39,7 +39,7 @@ install_dotnetCore <- function(channel = "LTS", version = "latest", installDir =
 		dir.create(binFolder, recursive = TRUE, showWarnings = FALSE)
 	}
 	if (is.null(installDir)) {
-		installDir <- file.path(binFolder, "dotnet-core")
+		installDir <- file.path(Sys.getenv("LocalAppData"), "Microsoft", "dotnet")
 	}
 	
 	arguments <- paste("-Channel", channel, "-Version", version, "-Runtime", runtime, "-NoPath", sep = ' ')
@@ -50,13 +50,19 @@ install_dotnetCore <- function(channel = "LTS", version = "latest", installDir =
 	} else {
 		argumentsList[[architecture]] = paste(arguments, "-Architecture", architecture, sep = ' ')
 	}
-		
+	
+	# Load settings
+	settings <- load_settings()
+
 	sysinf <- Sys.info()
 	if (sysinf["sysname"] == "Windows") {
 			
 		commandLine <- "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://dot.net/v1/dotnet-install.ps1')))"
 		for (arch in names(argumentsList)) {
-			arguments <- paste(argumentsList[[arch]], "-InstallDir", file.path(installDir, arch), sep = ' ')
+			install_dir <- file.path(installDir, arch)
+			settings[[arch]] <- install_dir
+
+			arguments <- paste(argumentsList[[arch]], "-InstallDir", install_dir, sep = ' ')
 			system2("powershell", 
 				args = c(
 				"-NoProfile",
@@ -68,11 +74,50 @@ install_dotnetCore <- function(channel = "LTS", version = "latest", installDir =
 	
 		commandLine <- "https://dot.net/v1/dotnet-install.sh | bash /dev/stdin"
 		for (arch in names(argumentsList)) {
-			arguments <- paste(argumentsList[[arch]], "-InstallDir", file.path(installDir, arch), sep = ' ')
+			install_dir <- file.path(installDir, arch)
+			settings[[arch]] <- install_dir
+
+			arguments <- paste(argumentsList[[arch]], "-InstallDir", install_dir, sep = ' ')
 			system2("curl", 
 				args = c(
 				"-sSL",
 				paste(commandLine, arguments, sep = ' ')))
 		}
 	}
+
+	save_settings(settings)
+}
+
+#' @title Load package settings
+#'
+#' @description
+#' Load the package settings which is used to store mainly the dotnet core installation folder. 
+#' The settings file is stores on the package root folder.
+#'
+load_settings <- function() {
+	settings_file_path <- get_settings_file_path()
+	if (file.exists(settings_file_path)) { 
+		return(readRDS(settings_file_path))
+	} else { 
+		return(list())
+	}
+}
+
+#' @title Save package settings
+#'
+#' @description
+#' Save the package settings which is used to store mainly the dotnet core installation folder. 
+#' The settings file is stores on the package root folder.
+#'
+save_settings <- function(settings) {
+	invisible(saveRDS(settings, file = get_settings_file_path()))
+}
+
+#' @title Gets settings file path
+#'
+#' @description
+#' Gets the settings file path.
+#'
+get_settings_file_path <- function() {
+	return(file.path(system.file(package = "sharper"), "settings.rds"))
 }
