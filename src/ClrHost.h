@@ -93,11 +93,7 @@ bool is_directory(const char* path);
 
 const char* path_combine(const char* path, const char* path2);
 
-const char* path_combine(const char* path, const char* path2, const char* path3);
-
 const char* path_expand(const char* path);
-
-void get_directories(const char* path, std::vector<std::string>& directories);
 
 const char* path_get_parent(const char* path);
 

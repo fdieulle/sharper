@@ -160,63 +160,27 @@ bool is_directory(const char* path) {
 
 const char* path_combine(const char* path, const char* path2) {
 	std::string combined(path);
-	combined.append(FS_SEPERATOR);
-	combined.append(path2);
-	return combined.c_str();
-}
+	combined = combined.append(FS_SEPERATOR);
+	combined = combined.append(path2);
 
-const char* path_combine(const char* path, const char* path2, const char* path3) {
-	std::string combined(path);
-	combined.append(FS_SEPERATOR);
-	combined.append(path2);
-	combined.append(FS_SEPERATOR);
-	combined.append(path3);
-	return combined.c_str();
+	char* result = new char[combined.size()];
+	std::strcpy(result, combined.c_str());
+	return result;
 }
 
 const char* path_expand(const char* path) {
-	if (path == NULL) return path;
-
+	if (path == NULL) return NULL;
+	
 	char expanded_path[MAX_PATH];
 #if WINDOWS
-	GetFullPathNameA(path, MAX_PATH, expanded_path, NULL);
+	int size = GetFullPathNameA(path, MAX_PATH, expanded_path, NULL);
 #elif LINUX
-	realpath(path, expanded_path);
+	int size = realpath(path, expanded_path);
 #endif
-	return std::string(expanded_path).c_str();
-}
 
-void get_directories(const char* path, std::vector<std::string>& directories) {
-	if (path == NULL || !is_directory(path)) return;
-
-#if WINDOWS
-	WIN32_FIND_DATAA findData;
-	HANDLE fileHandle = FindFirstFileA(path, &findData);
-
-	if (fileHandle != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			if (is_directory(path_combine(path, findData.cFileName)))
-				directories.push_back(findData.cFileName);
-
-		} while (FindNextFileA(fileHandle, &findData));
-		FindClose(fileHandle);
-	}
-#elif LINUX
-	DIR* dir = opendir(directory);
-	struct dirent* entry;
-	int extLength = strlen(extension);
-
-	while ((entry = readdir(dir)) != NULL)
-	{
-		if (is_directory(path_combine(path, entry->d_name)))
-		{
-			std::string filename(entry->d_name);
-			directories.push_back(filename);
-		}
-	}
-#endif
+	char* result = new char[size];
+	std::strcpy(result, expanded_path);
+	return result;
 }
 
 const char* path_get_parent(const char* path) {
