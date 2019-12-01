@@ -18,8 +18,30 @@ print(paste0("R_ARCH: ", R_ARCH))
 print(paste0("SHLIB_EXT: ", SHLIB_EXT))
 print(paste0("WINDOWS: ", WINDOWS))
 
-
+# Copy the c++ dll into package dir
 files <- Sys.glob(paste0("*", SHLIB_EXT))
 dest <- file.path(R_PACKAGE_DIR, paste0('libs', R_ARCH))
+print(sprintf("Copy the compiled C++ %s in %s", SHLIB_EXT, dest))
 dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
+
+configuration = "Debug"
+
+print("Publish the Sharper dotnet project")
+publish_cmd <- paste(
+	"dotnet", "publish",
+	file.path(R_PACKAGE_SOURCE, "src", "dotnet", "Sharper", "Sharper.csproj"),
+	"-o", file.path(R_PACKAGE_SOURCE, "inst", "bin"),
+	"-c", configuration, 
+	sep = " ")
+system(publish_cmd)
+
+print("Publish the dotnet test assembly for unit tests")
+publish_cmd <- paste(
+	"dotnet", "publish",
+	file.path(R_PACKAGE_SOURCE, "tests", "dotnet", "AssemblyForTests", "AssemblyForTests.csproj"),
+	"-o", file.path(R_PACKAGE_SOURCE, "inst", "tests"),
+	"-c", configuration, 
+	"--no-dependencies",
+	sep = " ")
+system(publish_cmd)
