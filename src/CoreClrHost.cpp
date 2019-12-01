@@ -45,11 +45,8 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	if (_coreClr == NULL)
 	{
 		Rf_error("Failed to load CoreCLR from %s\n", core_clr_path);
+		delete[] core_clr_path;
 		return;
-	}
-	else
-	{
-		Rprintf("Loaded CoreCLR from %s\n", core_clr_path);
 	}
 	delete[] core_clr_path;
 
@@ -117,7 +114,11 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	createManagedDelegate("CallStaticMethod", (void**)&_callStaticMethodFunc);
 	createManagedDelegate("GetStaticProperty", (void**)&_getStaticPropertyFunc);
 	createManagedDelegate("SetStaticProperty", (void**)&_setStaticPropertyFunc);
+	createManagedDelegate("CreateObject", (void**)&_createObjectFunc);
 	createManagedDelegate("ReleaseObject", (void**)&(CoreClrHost::releaseObjectFunc));
+	createManagedDelegate("CallMethod", (void**)&_callFunc);
+	createManagedDelegate("GetProperty", (void**)&_getFunc);
+	createManagedDelegate("SetProperty", (void**)&_setFunc);
 
 	delete[] app_base_dir_exp;
 }
@@ -190,9 +191,50 @@ void CoreClrHost::setStaticProperty(const char* typeName, const char* propertyNa
 	_setStaticPropertyFunc(typeName, propertyName, value);
 }
 
+int64_t CoreClrHost::createObject(const char* typeName, int64_t* args, int32_t argsSize)
+{
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		Rf_error("CoreCLR isn't started.");
+		return 0;
+	}
+
+	return _createObjectFunc(typeName, args, argsSize);
+}
+
 void CoreClrHost::registerFinalizer(SEXP sexp)
 {
 	R_RegisterCFinalizerEx(sexp, [](SEXP p) { CoreClrHost::releaseObjectFunc((int64_t)p); }, (Rboolean)1);
+}
+
+void CoreClrHost::callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) {
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		Rf_error("CoreCLR isn't started.");
+		return;
+	}
+
+	_callFunc(objectPtr, methodName, args, argsSize, results, resultsSize);
+}
+
+int64_t CoreClrHost::getProperty(int64_t objectPtr, const char* propertyName) {
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		Rf_error("CoreCLR isn't started.");
+		return 0;
+	}
+
+	return _getFunc(objectPtr, propertyName);
+}
+
+void CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64_t value) {
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		Rf_error("CoreCLR isn't started.");
+		return;
+	}
+
+	_setFunc(objectPtr, propertyName, value);
 }
 
 /*static*/ void CoreClrHost::build_tpa_list(const char* directory, const char* extension, std::string& tpaList)

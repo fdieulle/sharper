@@ -2,6 +2,7 @@
 using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
+using RDotNet;
 using Sharper.Converters;
 
 namespace Sharper.Tests
@@ -53,6 +54,39 @@ namespace Sharper.Tests
 
             type.TryGetMethod(methodName, flags, A(C<double>(), C<int[]>()), out method).CheckIsTrue();
             method.CheckIsNotNull();
+        }
+
+        [Test]
+        public void TestCreateObject()
+        {
+            var engine = REngine.GetInstance();
+            ClrProxy.LoadAssembly(PATH);
+
+            var externalPtr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+
+            ClrProxy.CallMethod(externalPtr, "ToString", null, 0, out var results, out var resultsSize);
+            Assert.IsNotNull(results);
+            Assert.AreEqual(1, resultsSize);
+            Assert.AreEqual(1, results.Length);
+
+            var sexp = engine.CreateFromNativeSexp(new IntPtr(results[0]));
+            Assert.AreEqual("AssemblyForTests.DefaultCtorData", sexp.AsCharacter().ToArray()[0]);
+        }
+
+        [Test]
+        public void TestGetAndSetProperty()
+        {
+            var engine = REngine.GetInstance();
+            ClrProxy.LoadAssembly(PATH);
+
+            var externalPtr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+
+            var sexp = engine.CreateCharacter("Test");
+            ClrProxy.SetProperty(externalPtr, "Name", sexp.DangerousGetHandle().ToInt64());
+
+            var result = ClrProxy.GetProperty(externalPtr, "Name");
+
+            Assert.AreEqual("Test", engine.CreateFromNativeSexp(new IntPtr(result)).AsCharacter()[0]);
         }
 
         private static IConverter C(Type type)

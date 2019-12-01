@@ -6,3 +6,7 @@ rLoadAssembly
 rCallStaticMethod
 rGetStaticProperty
 rSetStaticProperty
+rCreateObject
+rCallMethod
+rGetProperty
+rSetProperty

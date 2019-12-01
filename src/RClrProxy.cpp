@@ -25,7 +25,29 @@ SEXP rGetStaticProperty(SEXP p)
 	return mainHost.rGetStaticProperty(p);
 }
 
-void rSetStaticProperty(SEXP p)
+SEXP rSetStaticProperty(SEXP p)
 {
 	mainHost.rSetStaticProperty(p);
+	return R_NilValue;
+}
+
+SEXP rCreateObject(SEXP p)
+{
+	return mainHost.rCreateObject(p);
+}
+
+SEXP rCallMethod(SEXP p)
+{
+	return mainHost.rCallMethod(p);
+}
+
+SEXP rGetProperty(SEXP p)
+{
+	return mainHost.rGetProperty(p);
+}
+
+SEXP rSetProperty(SEXP p)
+{
+	mainHost.rSetProperty(p);
+	return R_NilValue;
 }

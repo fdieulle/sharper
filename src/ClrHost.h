@@ -67,9 +67,9 @@ public:
 	SEXP rGetStaticProperty(SEXP p);
 	void rSetStaticProperty(SEXP p);
 	SEXP rCreateObject(SEXP p);
-	SEXP rCall(SEXP p);
-	SEXP rGet(SEXP p);
-	SEXP rSet(SEXP p);
+	SEXP rCallMethod(SEXP p);
+	SEXP rGetProperty(SEXP p);
+	void rSetProperty(SEXP p);
 
 protected:
 	uint32_t _domainId;
@@ -78,13 +78,19 @@ protected:
 	virtual void callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
 	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName) = 0;
 	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value) = 0;
+	
+	virtual int64_t createObject(const char* typeName, int64_t* args, int32_t argsSize) = 0;
 	virtual void registerFinalizer(SEXP sexp) = 0;
+	virtual void callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
+	virtual int64_t getProperty(int64_t objectPtr, const char* propertyName) = 0;
+	virtual void setProperty(int64_t objectPtr, const char* propertyName, int64_t value) = 0;
 private:
 
 	char* readStringFromSexp(SEXP p);
 	int64_t* readParametersFromSexp(SEXP p, int32_t& length);
 	SEXP WrapResults(int64_t* results, int32_t length);
 	SEXP WrapResult(int64_t result);
+	int64_t readObjectPtrFromSexp(SEXP p);
 };
 
 bool file_exists(const char* path);

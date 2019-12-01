@@ -52,39 +52,71 @@ void ClrHost::rSetStaticProperty(SEXP p)
 	p = CDR(p); // Skip the first parameter because of function name
 	const char* typeName = readStringFromSexp(p); p = CDR(p);
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
+	int64_t value = (int64_t)CAR(p);
 
-	int32_t argsSize = 0;
-	int64_t* args = readParametersFromSexp(p, argsSize);
-
-	if (argsSize < 1)
-	{
-		Rf_error("Property value is missing\n");
-		return;
-	}
-
-	setStaticProperty(typeName, propertyName, args[0]);
-
-	delete[] args;
+	setStaticProperty(typeName, propertyName, value);
 }
 
 SEXP ClrHost::rCreateObject(SEXP p)
 {
-	return SEXP();
+	// 1 - Get data from SEXP
+	p = CDR(p); // Skip the first parameter because of function name
+	const char* typeName = readStringFromSexp(p); p = CDR(p);
+	
+	// 2 - Prepare arguments to call proxy
+	int32_t argsSize = 0;
+	int64_t* args = readParametersFromSexp(p, argsSize);
+
+	int64_t result = createObject(typeName, args, argsSize);
+
+	delete[] args;
+
+	return WrapResult(result);
 }
 
-SEXP ClrHost::rCall(SEXP p)
+SEXP ClrHost::rCallMethod(SEXP p)
 {
-	return SEXP();
+	// 1 - Get data from SEXP
+	p = CDR(p); // Skip the first parameter because of function name
+	int64_t objectPtr = readObjectPtrFromSexp(p); p = CDR(p);
+	const char* methodName = readStringFromSexp(p); p = CDR(p);
+
+	// 2 - Prepare arguments to call proxy
+	int32_t argsSize = 0;
+	int64_t* args = readParametersFromSexp(p, argsSize);
+
+	// 3 - Call delegate on clr runtime
+	int64_t* results;
+	int32_t resultsSize;
+	callMethod(objectPtr, methodName, args, argsSize, &results, &resultsSize);
+
+	delete[] args;
+
+	// 4 - Convert and return the result
+	return WrapResults(results, resultsSize);
 }
 
-SEXP ClrHost::rGet(SEXP p)
+SEXP ClrHost::rGetProperty(SEXP p)
 {
-	return SEXP();
+	// 1 - Get data from SEXP
+	p = CDR(p); // Skip the first parameter because of function name
+	int64_t objectPtr = readObjectPtrFromSexp(p); p = CDR(p);
+	const char* propertyName = readStringFromSexp(p); p = CDR(p);
+
+	int64_t result = getProperty(objectPtr, propertyName);
+
+	return WrapResult(result);
 }
 
-SEXP ClrHost::rSet(SEXP p)
+void ClrHost::rSetProperty(SEXP p)
 {
-	return SEXP();
+	// 1 - Get data from SEXP
+	p = CDR(p); // Skip the first parameter because of function name
+	int64_t objectPtr = readObjectPtrFromSexp(p); p = CDR(p);
+	const char* propertyName = readStringFromSexp(p); p = CDR(p);
+	int64_t value = (int64_t)CAR(p);
+
+	setProperty(objectPtr, propertyName, value);
 }
 
 char * ClrHost::readStringFromSexp(SEXP p)
@@ -113,6 +145,18 @@ int64_t* ClrHost::readParametersFromSexp(SEXP p, int32_t& length)
 	}
 
 	return result;
+}
+
+int64_t ClrHost::readObjectPtrFromSexp(SEXP p) {
+	SEXP e = CAR(p);
+
+	if (e == R_NilValue)
+	{
+		error("Can't get .net object pointer from a NULL parameter\n");
+		return 0;
+	}
+
+	return (int64_t)e;
 }
 
 SEXP ClrHost::WrapResults(int64_t* results, int32_t length)

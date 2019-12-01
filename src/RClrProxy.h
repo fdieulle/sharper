@@ -18,11 +18,11 @@ extern "C" {
 	// Proxy methods
 	SEXP rCallStaticMethod(SEXP p);
 	SEXP rGetStaticProperty(SEXP p);
-	void rSetStaticProperty(SEXP p);
-	//SEXP rCreateObject(SEXP p);
-	//SEXP rCall(SEXP p);
-	//SEXP rGet(SEXP p);
-	//SEXP rSet(SEXP p);
+	SEXP rSetStaticProperty(SEXP p);
+	SEXP rCreateObject(SEXP p);
+	SEXP rCallMethod(SEXP p);
+	SEXP rGetProperty(SEXP p);
+	SEXP rSetProperty(SEXP p);
 
 #ifdef __cplusplus
 } // end of extern "C" block

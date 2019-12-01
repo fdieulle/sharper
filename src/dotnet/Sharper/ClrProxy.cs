@@ -204,7 +204,7 @@ namespace Sharper
         }
 
         public static void CallMethod(
-            [MarshalAs(UnmanagedType.AsAny)] object instance,
+            [MarshalAs(UnmanagedType.U8)]  long objectPtr,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
             int argumentsSize,
@@ -213,12 +213,13 @@ namespace Sharper
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
-            logger.DebugFormat("[CallMethod] Instance: {0}, MethodName: {1}", instance, methodName);
+            logger.DebugFormat("[CallMethod] Instance: {0}, MethodName: {1}", objectPtr, methodName);
 
             try
             {
+                var instance = DataConverter.GetConverter(objectPtr)?.Convert(typeof(object));
                 if (instance == null)
-                    throw new ArgumentNullException(nameof(instance));
+                    throw new ArgumentNullException(nameof(objectPtr));
 
                 var type = instance.GetType();
 
@@ -244,15 +245,16 @@ namespace Sharper
 
         [return: MarshalAs(UnmanagedType.U8)]
         public static long GetProperty(
-            [MarshalAs(UnmanagedType.AsAny)] object instance,
+            [MarshalAs(UnmanagedType.U8)]  long objectPtr,
             [MarshalAs(UnmanagedType.LPStr)] string propertyName)
         {
-            logger.DebugFormat("[GetProperty] Instance: {0}, PropertyName: {1}", instance, propertyName);
+            logger.DebugFormat("[GetProperty] Instance: {0}, PropertyName: {1}", objectPtr, propertyName);
 
             try
             {
+                var instance = DataConverter.GetConverter(objectPtr)?.Convert(typeof(object));
                 if (instance == null)
-                    throw new ArgumentNullException(nameof(instance));
+                    throw new ArgumentNullException(nameof(objectPtr));
 
                 var type = instance.GetType();
 
@@ -275,16 +277,17 @@ namespace Sharper
         }
 
         public static void SetProperty(
-            object instance, 
+            [MarshalAs(UnmanagedType.U8)] long objectPtr, 
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
             [MarshalAs(UnmanagedType.U8)] long argumentPtr)
         {
-            logger.DebugFormat("[SetProperty] Instance: {0}, PropertyName: {1}", instance, propertyName);
+            logger.DebugFormat("[SetProperty] Instance: {0}, PropertyName: {1}", objectPtr, propertyName);
 
             try
             {
+                var instance = DataConverter.GetConverter(objectPtr)?.Convert(typeof(object));
                 if (instance == null)
-                    throw new ArgumentNullException(nameof(instance));
+                    throw new ArgumentNullException(nameof(objectPtr));
 
                 var type = instance.GetType();
 

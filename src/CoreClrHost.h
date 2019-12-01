@@ -59,11 +59,11 @@ typedef void (__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
 typedef void (__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, int64_t* argsPtr, int32_t size, int64_t** results, int32_t* resultsSize);
 typedef int64_t (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName);
 typedef void (__stdcall *setStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t value);
-//typedef ClrObject* (__stdcall *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size);
+typedef int64_t (__stdcall *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size);
 typedef void(__stdcall *releaseObject_ptr)(int64_t objPtr);
-//typedef ClrObject* (__stdcall *callMethod_ptr)(ClrObject* objPtr, const char* methodName, int64_t argsPtr[], int32_t size);
-//typedef ClrObject* (__stdcall *getMethod_ptr)(ClrObject* objPtr, const char* methodName);
-//typedef void(__stdcall *setMethod_ptr)(ClrObject* objPtr, const char* methodName, int64_t argPtr);
+typedef int64_t (__stdcall *callMethod_ptr)(int64_t objPtr, const char* methodName, int64_t* argsPtr, int32_t argsSize, int64_t** results, int32_t* resultsSize);
+typedef int64_t (__stdcall *getMethod_ptr)(int64_t objPtr, const char* methodName);
+typedef void(__stdcall *setMethod_ptr)(int64_t objPtr, const char* methodName, int64_t argPtr);
 
 class CoreClrHost : public ClrHost
 {
@@ -80,7 +80,11 @@ protected:
 	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName);
 	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value);
 
+	virtual int64_t createObject(const char* typeName, int64_t* args, int32_t argsSize);
 	virtual void registerFinalizer(SEXP sexp);
+	virtual void callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize);
+	virtual int64_t getProperty(int64_t objectPtr, const char* propertyName);
+	virtual void setProperty(int64_t objectPtr, const char* propertyName, int64_t value);
 
 private:
 #if WINDOWS
@@ -98,7 +102,11 @@ private:
 	callStaticMethod_ptr _callStaticMethodFunc;
 	getStaticProperty_ptr _getStaticPropertyFunc;
 	setStaticProperty_ptr _setStaticPropertyFunc;
+	createObject_ptr _createObjectFunc;
 	static releaseObject_ptr releaseObjectFunc;
+	callMethod_ptr _callFunc;
+	getMethod_ptr _getFunc;
+	setMethod_ptr _setFunc;
 
 	void createManagedDelegate(const char* entryPointMethodName, void** delegate);
 
