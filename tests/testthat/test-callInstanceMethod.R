@@ -66,5 +66,31 @@ test_that("Play with .Net object properties", {
 test_that("Dispose .Net object wrapper after R GC", {
   x <- netNew("AssemblyForTests.DefaultCtorData")
   x <- NULL
-  gc(full = TRUE, verbose = TRUE)
+  gc()
+})
+
+test_that("Call method with out argument", {
+  x <- netNew("AssemblyForTests.DefaultCtorData")
+  
+  value <- 1.0
+  result <- netCall(x, "TryGetValue", value)
+  expect_true(result)
+  expect_equal(value, 12.4)
+  
+  object <- NULL
+  result <- netCall(x, "TryGetObject", object)
+  expect_true(result)
+  expect_equal(netGet(object, "Name"), "Out object")
+})
+
+test_that("Call method with ref argument", {
+  x <- netNew("AssemblyForTests.DefaultCtorData")
+  
+  value <- 1.0
+  netCall(x, "UpdateValue", value)
+  expect_equal(value, 2.0)
+  
+  object <- NULL
+  netCall(x, "UpdateObject", object)
+  expect_equal(netGet(object, "Name"), "Ref object")
 })

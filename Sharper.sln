@@ -50,6 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{96F37B24-3C80-4A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testthat", "testthat", "{B955122F-D7A9-4BE1-8A6C-CA930D19F1D5}"
 	ProjectSection(SolutionItems) = preProject
+		tests\testthat\test-callInstanceMethod.R = tests\testthat\test-callInstanceMethod.R
 		tests\testthat\test-callStaticMethod.R = tests\testthat\test-callStaticMethod.R
 	EndProjectSection
 EndProject

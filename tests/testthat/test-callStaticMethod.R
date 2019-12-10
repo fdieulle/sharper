@@ -125,3 +125,30 @@ test_that("Date & Time convertion", {
 	#testTimezone("America/New_York")
 	#testTimezone("UTC", "Europe/Paris")
 })
+
+test_that("Call static method with out argument", {
+  
+  typeName = "AssemblyForTests.StaticClass"
+  
+  value <- 1.0
+  result <- netCallStatic(typeName, "TryGetValue", value)
+  expect_true(result)
+  expect_equal(value, 12.4)
+  
+  object <- NULL
+  result <- netCallStatic(typeName, "TryGetObject", object)
+  expect_true(result)
+  expect_equal(netGet(object, "Name"), "Out object")
+})
+
+test_that("Call static method with ref argument", {
+  typeName = "AssemblyForTests.StaticClass"
+  
+  value <- 1.0
+  netCallStatic(typeName, "UpdateValue", value)
+  expect_equal(value, 2.0)
+  
+  object <- NULL
+  netCallStatic(typeName, "UpdateObject", object)
+  expect_equal(netGet(object, "Name"), "Ref object")
+})

@@ -87,13 +87,10 @@ namespace Sharper
                 for (var i = 0; i < argumentsSize; i++)
                     converters[i] = DataConverter.GetConverter(argumentsPtr[i]);
 
-                if (!type.TryGetMethod(methodName, flags, converters, out MethodInfo method))
+                if (!type.TryGetMethod(methodName, flags, converters, out var method))
                     throw new MissingMethodException($"Method not found, Type: {typeName}, Method: {methodName}");
 
-                var result = method.Call(null, converters);
-                var symbols = DataConverter.ConvertBack(method.ReturnType, result);
-                results = new[] {(long)symbols};
-                resultsSize = 1;
+                InternalCallMethod(method, null, converters, out results, out resultsSize);
             }
             catch (Exception e)
             {
@@ -120,7 +117,7 @@ namespace Sharper
                 if (!property.CanRead)
                     throw new InvalidOperationException($"Static property {propertyName} can't be get for Type: {type.FullName}");
 
-                var result = property.GetGetMethod().Call(null, new IConverter[0]);
+                var result = property.GetGetMethod().Call(null, new IConverter[0])[0];
                 return DataConverter.ConvertBack(property.PropertyType, result);
             }
             catch (Exception e)
@@ -216,10 +213,7 @@ namespace Sharper
                 if (!type.TryGetMethod(methodName, flags, converters, out var method))
                     throw new MissingMethodException($"Method not found for Type: {type}, Method: {methodName}");
 
-                var result = method.Call(instance, converters);
-                var symbols = DataConverter.ConvertBack(method.ReturnType, result);
-                results = new[] { symbols };
-                resultsSize = 1;
+                InternalCallMethod(method, instance, converters, out results, out resultsSize);
             }
             catch (Exception e)
             {
@@ -251,7 +245,7 @@ namespace Sharper
                 if (!property.CanRead)
                     throw new InvalidOperationException($"Property {propertyName} can't be get for Type: {type.FullName}");
 
-                var result = property.GetGetMethod().Call(instance, new IConverter[0]);
+                var result = property.GetGetMethod().Call(instance, new IConverter[0])[0];
                 return DataConverter.ConvertBack(property.PropertyType, result);
             }
             catch (Exception e)
@@ -293,6 +287,21 @@ namespace Sharper
                 logger.Error("[SetProperty]", e);
                 //LastException = Format(e);
                 throw;
+            }
+        }
+
+        private static void InternalCallMethod(MethodInfo method, object instance, IConverter[] converters, out long[] results, out int resultsSize)
+        {
+            var objects = method.Call(instance, converters);
+            resultsSize = objects.Length;
+            results = new long[resultsSize];
+
+            results[0] = DataConverter.ConvertBack(method.ReturnType, objects[0]);
+            if (resultsSize > 1)
+            {
+                var parameters = method.GetParameters();
+                for (var i = 1; i < results.Length; i++)
+                    results[i] = DataConverter.ConvertBack(parameters[i - 1].ParameterType.Extract(), objects[i]);
             }
         }
     }

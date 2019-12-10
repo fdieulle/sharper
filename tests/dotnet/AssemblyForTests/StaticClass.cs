@@ -51,6 +51,10 @@ namespace AssemblyForTests
             Console.WriteLine("SameMethodName(double, int[]) arg1: {0}, arg2: {1}", doubleValue, string.Join(";", intValue));
         }
 
+        public static void SameMethodName(DefaultCtorData data)
+        {
+            Console.WriteLine("SameMethodName(DefaultCtorData) arg: {0}", data);
+        }
         #endregion
 
         #region Returns Native types
@@ -90,6 +94,32 @@ namespace AssemblyForTests
         public static int Int32Property { get; set; } = 13;
 
         public static int[] Int32ArrayProperty { get; set; } = { 12, 13, 14 };
+
+        #endregion
+
+        #region Method with out arguments
+
+        public static bool TryGetValue(out double value)
+        {
+            value = 12.4;
+            return true;
+        }
+
+        public static bool TryGetObject(out DefaultCtorData data)
+        {
+            data = new DefaultCtorData { Name = "Out object" };
+            return true;
+        }
+
+        public static void UpdateValue(ref double value)
+        {
+            value += 1;
+        }
+
+        public static void UpdateObject(ref DefaultCtorData data)
+        {
+            data = new DefaultCtorData { Name = "Ref object", Integers = data?.Integers };
+        }
 
         #endregion
     }

@@ -305,16 +305,31 @@ namespace Sharper
             return methods[indexMatched];
         }
 
-        public static object Call(this MethodInfo method, object instance, IConverter[] converters)
+        public static object[] Call(this MethodInfo method, object instance, IConverter[] converters)
         {
             var length = converters.Length;
             var args = new object[length];
             var parameters = method.GetParameters();
 
+            var hasByRef = false;
             for (var i = 0; i < length; i++)
+            {
+                hasByRef |= parameters[i].ParameterType.IsByRef;
                 args[i] = converters[i].Convert(parameters[i].ParameterType.Extract());
+            }
 
-            return method.Invoke(instance, args);
+            var result = method.Invoke(instance, args);
+            if (hasByRef)
+            {
+                // Todo: we can do better by naming the arguments and defined which one is by ref for R
+                var results = new object[1 + length];
+                results[0] = result;
+                for (var i = 0; i < length; i++)
+                    results[i + 1] = args[i];
+                return results;
+            }
+
+            return new []{ result };
         }
 
         public static object Call(this ConstructorInfo ctor, IConverter[] converters)
@@ -336,6 +351,8 @@ namespace Sharper
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                 return type.GetGenericArguments()[0];
+            if (type.IsByRef && type.HasElementType)
+                return type.GetElementType();
             return type;
         }
 

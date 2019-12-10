@@ -7,6 +7,32 @@
         public int[] Integers { get; set; }
 
         public OneCtorData OneCtorData { get; set; }
+
+        #region Method with out arguments
+
+        public bool TryGetValue(out double value)
+        {
+            value = 12.4;
+            return true;
+        }
+
+        public bool TryGetObject(out DefaultCtorData data)
+        {
+            data = new DefaultCtorData { Name = "Out object" };
+            return true;
+        }
+
+        public void UpdateValue(ref double value)
+        {
+            value += 1;
+        }
+
+        public void UpdateObject(ref DefaultCtorData data)
+        {
+            data = new DefaultCtorData { Name = "Ref object", Integers = data?.Integers };
+        }
+
+        #endregion
     }
 
     public class OneCtorData

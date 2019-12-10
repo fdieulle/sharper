@@ -27,6 +27,13 @@
 #' netCall(x, "ToString")
 #' }
 netCall <- function(x, methodName, ...) {
-  result <- .External("rCallMethod", x, methodName, ..., PACKAGE = 'sharper')
-  return (result[[1]])
+	results <- .External("rCallMethod", x, methodName, ..., PACKAGE = 'sharper')
+	if (length(results) > 1) {
+		args <- lapply(eval(substitute(alist(...))), deparse)
+		for (i in seq_along(length(args))) {
+			assign(args[[i]], results[[i + 1]], env = parent.frame())
+		}
+	} 
+	
+	return (results[[1]])
 }

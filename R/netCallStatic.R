@@ -34,6 +34,13 @@
 #' netCallStatic(type, "SameMethodName", c(1.24, 1.25), 12L)
 #' }
 netCallStatic <- function(typeName, methodName, ...) {
-	result <- .External("rCallStaticMethod", typeName, methodName, ..., PACKAGE = 'sharper')
-	return (result[[1]])
+	results <- .External("rCallStaticMethod", typeName, methodName, ..., PACKAGE = 'sharper')
+	if (length(results) > 1) {
+		args <- lapply(eval(substitute(alist(...))), deparse)
+		for (i in seq_along(length(args))) {
+			assign(args[[i]], results[[i + 1]], env = parent.frame())
+		}
+	} 
+	
+	return (results[[1]])
 }
