@@ -5,7 +5,6 @@ context("call instance methods")
 
 package_folder = path.package("sharper")
 assembly_file <- file.path(package_folder, "tests", "AssemblyForTests.dll")
-assembly_file <- "C:/OtherDrive/Workspace/Git/fdieulle/sharper/tests/dotnet/AssemblyForTests/bin/Debug/netstandard2.0/AssemblyForTests.dll"
 netLoadAssembly(assembly_file)
 
 test_that("Instanciate a .Net object", {
@@ -62,4 +61,10 @@ test_that("Play with .Net object properties", {
   x_ref <-netGet(x, "OneCtorData")
   expect_equal(x_ref, ref)
   expect_equal(netCall(x_ref, "ToString"), netCall(ref, "ToString"))
+})
+
+test_that("Dispose .Net object wrapper after R GC", {
+  x <- netNew("AssemblyForTests.DefaultCtorData")
+  x <- NULL
+  gc(full = TRUE, verbose = TRUE)
 })

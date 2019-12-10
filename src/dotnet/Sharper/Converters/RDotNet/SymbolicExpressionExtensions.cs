@@ -16,6 +16,12 @@ namespace Sharper.Converters.RDotNet
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate IntPtr R_ExternalPtrAddr(IntPtr args);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void R_CFinalizer_t(IntPtr s);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void R_RegisterCFinalizerEx(IntPtr s, R_CFinalizer_t fun, bool onExit);
+
     public static class SymbolicExpressionExtensions
     {
         public static SymbolicExpression ToExternalPointer(this REngine engine, object instance) 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using RDotNet;
 
@@ -31,9 +32,11 @@ namespace Sharper.Converters.RDotNet
 
         #region IDisposable
 
-        public void Dispose()
+        public void Dispose() => Disposing(_sexp);
+
+        private static void Disposing(SymbolicExpression sexp)
         {
-            var objPtr = _sexp.Engine.GetFunction<R_ExternalPtrAddr>()(_sexp.DangerousGetHandle());
+            var objPtr = sexp.Engine.GetFunction<R_ExternalPtrAddr>()(sexp.DangerousGetHandle());
             Marshal.Release(objPtr);
         }
 
@@ -49,7 +52,13 @@ namespace Sharper.Converters.RDotNet
                 tag.DangerousGetHandle(),
                 engine.NilValue.DangerousGetHandle());
 
-            return engine.CreateFromNativeSexp(ptr);
+            var sexp = engine.CreateFromNativeSexp(ptr);
+            engine.GetFunction<R_RegisterCFinalizerEx>()(
+                sexp.DangerousGetHandle(),
+                p => Disposing(sexp), 
+                true);
+
+            return sexp;
         }
 
         public static Type[] ExtractTypes(SymbolicExpression sexp)
