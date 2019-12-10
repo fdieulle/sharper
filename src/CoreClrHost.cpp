@@ -1,5 +1,7 @@
 #include "CoreClrHost.h"
 
+releaseObject_ptr CoreClrHost::releaseObjectFunc;
+
 CoreClrHost::CoreClrHost()
 {
 }
@@ -114,6 +116,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	createManagedDelegate("SetStaticProperty", (void**)&_setStaticPropertyFunc);
 	createManagedDelegate("CreateObject", (void**)&_createObjectFunc);
 	createManagedDelegate("CallMethod", (void**)&_callFunc);
+	createManagedDelegate("ReleaseObject", (void**)&(CoreClrHost::releaseObjectFunc));
 	createManagedDelegate("GetProperty", (void**)&_getFunc);
 	createManagedDelegate("SetProperty", (void**)&_setFunc);
 
@@ -197,6 +200,11 @@ int64_t CoreClrHost::createObject(const char* typeName, int64_t* args, int32_t a
 	}
 
 	return _createObjectFunc(typeName, args, argsSize);
+}
+
+void CoreClrHost::registerFinalizer(SEXP sexp)
+{
+	R_RegisterCFinalizerEx(sexp, [](SEXP p) { CoreClrHost::releaseObjectFunc((int64_t)p); }, (Rboolean)1);
 }
 
 void CoreClrHost::callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) {

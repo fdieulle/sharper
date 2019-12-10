@@ -25,6 +25,7 @@ namespace Sharper.Converters.RDotNet
         public object Convert(Type type)
         {
             var pointer = _sexp.Engine.GetFunction<R_ExternalPtrAddr>()(_sexp.DangerousGetHandle());
+
             return Marshal.GetObjectForIUnknown(pointer);
         }
 
@@ -32,11 +33,11 @@ namespace Sharper.Converters.RDotNet
 
         #region IDisposable
 
-        public void Dispose() => Disposing(_sexp);
+        public void Dispose() => Release(_sexp.Engine, _sexp.DangerousGetHandle());
 
-        private static void Disposing(SymbolicExpression sexp)
+        public static void Release(REngine engine, IntPtr pointer)
         {
-            var objPtr = sexp.Engine.GetFunction<R_ExternalPtrAddr>()(sexp.DangerousGetHandle());
+            var objPtr = engine.GetFunction<R_ExternalPtrAddr>()(pointer);
             Marshal.Release(objPtr);
         }
 
@@ -51,16 +52,12 @@ namespace Sharper.Converters.RDotNet
                 Marshal.GetIUnknownForObject(instance),
                 tag.DangerousGetHandle(),
                 engine.NilValue.DangerousGetHandle());
-
+            
             var sexp = engine.CreateFromNativeSexp(ptr);
-            engine.GetFunction<R_RegisterCFinalizerEx>()(
-                sexp.DangerousGetHandle(),
-                p => Disposing(sexp), 
-                true);
 
             return sexp;
         }
-
+        
         public static Type[] ExtractTypes(SymbolicExpression sexp)
         {
             var tagPtr = sexp.Engine.GetFunction<R_ExternalPtrTag>()(sexp.DangerousGetHandle());

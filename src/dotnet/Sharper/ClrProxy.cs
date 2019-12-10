@@ -186,6 +186,20 @@ namespace Sharper
             }
         }
 
+        public static void ReleaseObject([MarshalAs(UnmanagedType.U8)] long objectPtr)
+        {
+            logger.Debug("[ReleaseObject]");
+            try
+            {
+                DataConverter.Release(objectPtr);
+            }
+            catch (Exception e)
+            {
+                logger.Error("[ReleaseObject]", e);
+                throw;
+            }
+        }
+
         public static void CallMethod(
             [MarshalAs(UnmanagedType.U8)]  long objectPtr,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,

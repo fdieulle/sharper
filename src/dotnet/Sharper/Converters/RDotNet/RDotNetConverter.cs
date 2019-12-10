@@ -55,8 +55,7 @@ namespace Sharper.Converters.RDotNet
 
         public void Release(long pointer)
         {
-            var sexp = engine.CreateFromNativeSexp(new IntPtr(pointer));
-            sexp?.Dispose();
+            ExternalPtrConverter.Release(engine, new IntPtr(pointer));
         }
 
         #endregion

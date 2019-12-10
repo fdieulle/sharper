@@ -171,7 +171,12 @@ SEXP ClrHost::WrapResults(int64_t* results, int32_t length)
 
 SEXP ClrHost::WrapResult(int64_t result)
 {
-	return result == 0 ? R_NilValue : (SEXP)result;
+	SEXP sexp = result == 0 ? R_NilValue : (SEXP)result;
+
+	if (TYPEOF(sexp) == EXTPTRSXP)
+		registerFinalizer(sexp);
+
+	return sexp;
 }
 
 bool file_exists(const char* path) {

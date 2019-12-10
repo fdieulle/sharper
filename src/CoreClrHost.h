@@ -81,6 +81,7 @@ protected:
 	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value);
 
 	virtual int64_t createObject(const char* typeName, int64_t* args, int32_t argsSize);
+	virtual void registerFinalizer(SEXP sexp);
 	virtual void callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize);
 	virtual int64_t getProperty(int64_t objectPtr, const char* propertyName);
 	virtual void setProperty(int64_t objectPtr, const char* propertyName, int64_t value);
@@ -102,6 +103,7 @@ private:
 	getStaticProperty_ptr _getStaticPropertyFunc;
 	setStaticProperty_ptr _setStaticPropertyFunc;
 	createObject_ptr _createObjectFunc;
+	static releaseObject_ptr releaseObjectFunc;
 	callMethod_ptr _callFunc;
 	getMethod_ptr _getFunc;
 	setMethod_ptr _setFunc;
