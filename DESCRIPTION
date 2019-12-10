@@ -11,7 +11,8 @@ License: MIT
 URL: https://github.com/fdieulle/sharper
 BugReports: https://github.com/fdieulle/sharper/issues
 Depends: 
-	R (>= 3.4.0)
+	R (>= 3.4.0),
+	R6
 Imports:
 	methods
 Suggests:

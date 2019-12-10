@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{3E219373-D6C9-46
 		R\netGetStatic.R = R\netGetStatic.R
 		R\netLoadAssembly.R = R\netLoadAssembly.R
 		R\netNew.R = R\netNew.R
+		R\netObject.R = R\netObject.R
 		R\netSet.R = R\netSet.R
 		R\netSetStatic.R = R\netSetStatic.R
 		R\start_clr.R = R\start_clr.R
