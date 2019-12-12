@@ -55,6 +55,7 @@ CORECLR_HOSTING_API(coreclr_execute_assembly,
 #endif
 
 // Function pointer types for the managed call and callbacks
+typedef const char*(__stdcall *getLastError_ptr)();
 typedef void (__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
 typedef void (__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, int64_t* argsPtr, int32_t size, int64_t** results, int32_t* resultsSize);
 typedef int64_t (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName);
@@ -75,6 +76,7 @@ public:
 	virtual void shutdown();
 
 protected:
+	virtual const char* getLastError();
 	virtual void loadAssembly(const char* filePath);
 	virtual void callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize);
 	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName);
@@ -98,6 +100,7 @@ private:
 	coreclr_create_delegate_ptr _createManagedDelegate;
 	coreclr_shutdown_ptr _shutdownCoreClr;
 
+	getLastError_ptr _getLastErrorFunc;
 	loadAssembly_ptr _loadAssemblyFunc;
 	callStaticMethod_ptr _callStaticMethodFunc;
 	getStaticProperty_ptr _getStaticPropertyFunc;

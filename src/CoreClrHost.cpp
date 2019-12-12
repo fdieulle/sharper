@@ -110,6 +110,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	}
 
 	// 5. Create delegates to managed code to be able to invoke them
+	createManagedDelegate("GetLastError", (void**)&_getLastErrorFunc);
 	createManagedDelegate("LoadAssembly", (void**)&_loadAssemblyFunc);
 	createManagedDelegate("CallStaticMethod", (void**)&_callStaticMethodFunc);
 	createManagedDelegate("GetStaticProperty", (void**)&_getStaticPropertyFunc);
@@ -145,6 +146,16 @@ void CoreClrHost::shutdown()
 #endif
 
 	_coreClr = NULL;
+}
+
+const char* CoreClrHost::getLastError() 
+{
+	if (_coreClr == NULL && _hostHandle == NULL)
+	{
+		return "CoreCLR isn't started.";
+	}
+
+	return _getLastErrorFunc();
 }
 
 void CoreClrHost::loadAssembly(const char * filePath)

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using Sharper.Converters;
 using Sharper.Converters.RDotNet;
 using Sharper.Loggers;
+using Sharper.R6;
 
 namespace Sharper
 {
@@ -94,8 +97,10 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[CallStaticMethod]", e);
-                throw;
+                LogError("[CallStaticMethod]", e);
+                //throw;
+                results = null;
+                resultsSize = 0;
             }
         }
 
@@ -122,7 +127,7 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[GetStaticProperty]", e);
+                LogError("[GetStaticProperty]", e);
                 throw;
             }
         }
@@ -151,7 +156,7 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[SetStaticProperty]", e);
+                LogError("[SetStaticProperty]", e);
                 throw;
             }
         }
@@ -181,7 +186,7 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[CreateInstance]", e);
+                LogError("[CreateInstance]", e);
                 throw;
             }
         }
@@ -231,8 +236,7 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[CallMethod]", e);
-                //LastException = Format(e);
+                LogError("[CallMethod]", e);
                 throw;
             }
         }
@@ -264,8 +268,7 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[GetProperty]", e);
-                //LastException = Format(e);
+                LogError("[GetProperty]", e);
                 throw;
             }
         }
@@ -298,8 +301,7 @@ namespace Sharper
             }
             catch (Exception e)
             {
-                logger.Error("[SetProperty]", e);
-                //LastException = Format(e);
+                LogError("[SetProperty]", e);
                 throw;
             }
         }
@@ -318,5 +320,30 @@ namespace Sharper
                     results[i] = DataConverter.ConvertBack(parameters[i - 1].ParameterType.Extract(), objects[i]);
             }
         }
+
+        #region Manage errors
+        private static readonly StringBuilder lastErrors = new StringBuilder();
+        private static void LogError(string message, Exception e)
+        {
+            logger.Error(message, e);
+
+            lastErrors.Clear();
+            lastErrors.AppendLine(message);
+            while (e != null)
+            {
+                lastErrors.Append("[Message] ");
+                lastErrors.AppendLine(e.Message);
+                lastErrors.Append("[Source] ");
+                lastErrors.AppendLine(e.Source);
+                lastErrors.Append("[StackTrace] ");
+                lastErrors.AppendLine(e.StackTrace);
+                e = e.InnerException;
+            }
+        }
+
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static string GetLastError() => lastErrors.ToString();
+
+        #endregion
     }
 }

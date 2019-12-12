@@ -74,6 +74,7 @@ public:
 protected:
 	uint32_t _domainId;
 
+	virtual const char* getLastError() = 0;
 	virtual void loadAssembly(const char* filePath) = 0;
 	virtual void callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
 	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName) = 0;
