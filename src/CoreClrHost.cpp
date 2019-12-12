@@ -158,59 +158,59 @@ const char* CoreClrHost::getLastError()
 	return _getLastErrorFunc();
 }
 
-void CoreClrHost::loadAssembly(const char * filePath)
+bool CoreClrHost::loadAssembly(const char * filePath)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return;
+		return true;
 	}
 
-	_loadAssemblyFunc(filePath);
+	return _loadAssemblyFunc(filePath);
 }
 
-void CoreClrHost::callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize)
+bool CoreClrHost::callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return;
+		return true;
 	}
 
-	_callStaticMethodFunc(typeName, methodName, args, argsSize, results, resultsSize);
+	return _callStaticMethodFunc(typeName, methodName, args, argsSize, results, resultsSize);
 }
 
-int64_t CoreClrHost::getStaticProperty(const char* typeName, const char* propertyName)
+bool CoreClrHost::getStaticProperty(const char* typeName, const char* propertyName, int64_t* value)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return 0;
+		return true;
 	}
 
-	return _getStaticPropertyFunc(typeName, propertyName);
+	return _getStaticPropertyFunc(typeName, propertyName, value);
 }
 
-void CoreClrHost::setStaticProperty(const char* typeName, const char* propertyName, int64_t value)
+bool CoreClrHost::setStaticProperty(const char* typeName, const char* propertyName, int64_t value)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return;
+		return true;
 	}
 
-	_setStaticPropertyFunc(typeName, propertyName, value);
+	return _setStaticPropertyFunc(typeName, propertyName, value);
 }
 
-int64_t CoreClrHost::createObject(const char* typeName, int64_t* args, int32_t argsSize)
+bool CoreClrHost::createObject(const char* typeName, int64_t* args, int32_t argsSize, int64_t* value)
 {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return 0;
+		return true;
 	}
 
-	return _createObjectFunc(typeName, args, argsSize);
+	return _createObjectFunc(typeName, args, argsSize, value);
 }
 
 void CoreClrHost::registerFinalizer(SEXP sexp)
@@ -218,34 +218,34 @@ void CoreClrHost::registerFinalizer(SEXP sexp)
 	R_RegisterCFinalizerEx(sexp, [](SEXP p) { CoreClrHost::releaseObjectFunc((int64_t)p); }, (Rboolean)1);
 }
 
-void CoreClrHost::callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) {
+bool CoreClrHost::callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return;
+		return true;
 	}
 
-	_callFunc(objectPtr, methodName, args, argsSize, results, resultsSize);
+	return _callFunc(objectPtr, methodName, args, argsSize, results, resultsSize);
 }
 
-int64_t CoreClrHost::getProperty(int64_t objectPtr, const char* propertyName) {
+bool CoreClrHost::getProperty(int64_t objectPtr, const char* propertyName, int64_t* value) {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return 0;
+		return true;
 	}
 
-	return _getFunc(objectPtr, propertyName);
+	return _getFunc(objectPtr, propertyName, value);
 }
 
-void CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64_t value) {
+bool CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64_t value) {
 	if (_coreClr == NULL && _hostHandle == NULL)
 	{
 		Rf_error("CoreCLR isn't started.");
-		return;
+		return true;
 	}
 
-	_setFunc(objectPtr, propertyName, value);
+	return _setFunc(objectPtr, propertyName, value);
 }
 
 /*static*/ void CoreClrHost::build_tpa_list(const char* directory, const char* extension, std::string& tpaList)

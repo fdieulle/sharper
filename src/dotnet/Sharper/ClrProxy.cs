@@ -31,12 +31,13 @@ namespace Sharper
 
         #endregion
 
-        public static void LoadAssembly([MarshalAs(UnmanagedType.LPStr)] string pathOrAssemblyName)
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool LoadAssembly([MarshalAs(UnmanagedType.LPStr)] string pathOrAssemblyName)
         {
             logger.InfoFormat("[LoadAssembly] Path or AssemblyName: {0}", pathOrAssemblyName);
 
             if (string.IsNullOrEmpty(pathOrAssemblyName))
-                return;
+                return true;
 
             try
             {
@@ -47,29 +48,30 @@ namespace Sharper
                     foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                     {
                         if (string.Equals(assembly.ManifestModule.Name, assemblyName))
-                            return;
+                            return true;
                     }
 
                     Assembly.LoadFrom(filePath);
-                    return;
+                    return true;
                 }
 
                 if (pathOrAssemblyName.IsFullyQualifiedAssemblyName())
                 {
                     Assembly.Load(pathOrAssemblyName);
-                    return;
+                    return true;
                 }
 
                 throw new FileLoadException($"Unable to load assembly: {pathOrAssemblyName}");
             }
             catch (Exception e)
             {
-                logger.Error("[LoadAssembly]", e);
-                throw;
+                LogExceptions("[LoadAssembly]", e);
+                return false;
             }
         }
 
-        public static void CallStaticMethod(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool CallStaticMethod(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
@@ -94,20 +96,23 @@ namespace Sharper
                     throw new MissingMethodException($"Method not found, Type: {typeName}, Method: {methodName}");
 
                 InternalCallMethod(method, null, converters, out results, out resultsSize);
+
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[CallStaticMethod]", e);
-                //throw;
+                LogExceptions("[CallStaticMethod]", e);
                 results = null;
                 resultsSize = 0;
+                return false;
             }
         }
 
-        [return: MarshalAs(UnmanagedType.U8)]
-        public static long GetStaticProperty(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool GetStaticProperty(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
-            [MarshalAs(UnmanagedType.LPStr)] string propertyName)
+            [MarshalAs(UnmanagedType.LPStr)] string propertyName,
+            [Out, MarshalAs(UnmanagedType.U8)] out long value)
         {
             logger.DebugFormat("[GetStaticProperty] TypeName: {0}, PropertyName: {1}", typeName, propertyName);
 
@@ -123,16 +128,20 @@ namespace Sharper
                     throw new InvalidOperationException($"Static property {propertyName} can't be get for Type: {type.FullName}");
 
                 var result = property.GetGetMethod().Call(null, new IConverter[0])[0];
-                return DataConverter.ConvertBack(property.PropertyType, result);
+                value = DataConverter.ConvertBack(property.PropertyType, result);
+
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[GetStaticProperty]", e);
-                throw;
+                LogExceptions("[GetStaticProperty]", e);
+                value = 0;
+                return false;
             }
         }
 
-        public static void SetStaticProperty(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool SetStaticProperty(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
             [MarshalAs(UnmanagedType.U8)] long argumentPtr)
@@ -153,19 +162,21 @@ namespace Sharper
                 var converters = new[] { DataConverter.GetConverter(argumentPtr) };
 
                 property.GetSetMethod().Call(null, converters);
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[SetStaticProperty]", e);
-                throw;
+                LogExceptions("[SetStaticProperty]", e);
+                return false;
             }
         }
 
-        [return: MarshalAs(UnmanagedType.U8)]
-        public static long CreateObject(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool CreateObject(
             [MarshalAs(UnmanagedType.LPStr)] string typeName,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] long[] argumentsPtr,
-            int argumentsSize)
+            int argumentsSize,
+            [Out, MarshalAs(UnmanagedType.U8)] out long objectPtr)
         {
             logger.DebugFormat("[CreateInstance] TypeName: {0}", typeName);
 
@@ -182,30 +193,35 @@ namespace Sharper
                     throw new MissingMemberException($"Constructor not found for Type: {typeName}");
 
                 var result = ctor.Call(converters);
-                return DataConverter.ConvertBack(type, result);
+                objectPtr = DataConverter.ConvertBack(type, result);
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[CreateInstance]", e);
-                throw;
+                LogExceptions("[CreateInstance]", e);
+                objectPtr = 0;
+                return false;
             }
         }
 
-        public static void ReleaseObject([MarshalAs(UnmanagedType.U8)] long objectPtr)
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool ReleaseObject([MarshalAs(UnmanagedType.U8)] long objectPtr)
         {
             logger.Debug("[ReleaseObject]");
             try
             {
                 DataConverter.Release(objectPtr);
+                return true;
             }
             catch (Exception e)
             {
-                logger.Error("[ReleaseObject]", e);
-                throw;
+                LogExceptions("[ReleaseObject]", e);
+                return false;
             }
         }
 
-        public static void CallMethod(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool CallMethod(
             [MarshalAs(UnmanagedType.U8)]  long objectPtr,
             [MarshalAs(UnmanagedType.LPStr)] string methodName,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] long[] argumentsPtr,
@@ -233,18 +249,23 @@ namespace Sharper
                     throw new MissingMethodException($"Method not found for Type: {type}, Method: {methodName}");
 
                 InternalCallMethod(method, instance, converters, out results, out resultsSize);
+
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[CallMethod]", e);
-                throw;
+                LogExceptions("[CallMethod]", e);
+                results = null;
+                resultsSize = 0;
+                return false;
             }
         }
 
-        [return: MarshalAs(UnmanagedType.U8)]
-        public static long GetProperty(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool GetProperty(
             [MarshalAs(UnmanagedType.U8)]  long objectPtr,
-            [MarshalAs(UnmanagedType.LPStr)] string propertyName)
+            [MarshalAs(UnmanagedType.LPStr)] string propertyName,
+            [Out, MarshalAs(UnmanagedType.U8)] out long value)
         {
             logger.DebugFormat("[GetProperty] Instance: {0}, PropertyName: {1}", objectPtr, propertyName);
 
@@ -264,16 +285,19 @@ namespace Sharper
                     throw new InvalidOperationException($"Property {propertyName} can't be get for Type: {type.FullName}");
 
                 var result = property.GetGetMethod().Call(instance, new IConverter[0])[0];
-                return DataConverter.ConvertBack(property.PropertyType, result);
+                value = DataConverter.ConvertBack(property.PropertyType, result);
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[GetProperty]", e);
-                throw;
+                LogExceptions("[GetProperty]", e);
+                value = 0;
+                return false;
             }
         }
 
-        public static void SetProperty(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static bool SetProperty(
             [MarshalAs(UnmanagedType.U8)] long objectPtr, 
             [MarshalAs(UnmanagedType.LPStr)] string propertyName,
             [MarshalAs(UnmanagedType.U8)] long argumentPtr)
@@ -298,11 +322,12 @@ namespace Sharper
                 var converters = new[] { DataConverter.GetConverter(argumentPtr) };
 
                 property.GetSetMethod().Call(instance, converters);
+                return true;
             }
             catch (Exception e)
             {
-                LogError("[SetProperty]", e);
-                throw;
+                LogExceptions("[SetProperty]", e);
+                return false;
             }
         }
 
@@ -323,7 +348,7 @@ namespace Sharper
 
         #region Manage errors
         private static readonly StringBuilder lastErrors = new StringBuilder();
-        private static void LogError(string message, Exception e)
+        private static void LogExceptions(string message, Exception e)
         {
             logger.Error(message, e);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
@@ -104,7 +105,7 @@ namespace Sharper.Tests
             arguments = new[] { (long)sexp2.DangerousGetHandle(), (long)sexp.DangerousGetHandle() };
             ClrProxy.CallStaticMethod(typeName, methodName, arguments, arguments.Length, out _, out _);
 
-            var externalPtr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+            Assert.IsTrue(ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0, out var externalPtr));
             arguments = new[] {externalPtr};
             ClrProxy.CallStaticMethod(typeName, methodName, arguments, arguments.Length, out _, out _);
         }
@@ -115,7 +116,7 @@ namespace Sharper.Tests
             var engine = REngine.GetInstance();
             ClrProxy.LoadAssembly(PATH);
 
-            var externalPtr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+            Assert.IsTrue(ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0, out var externalPtr));
 
             ClrProxy.CallMethod(externalPtr, "ToString", null, 0, out var results, out var resultsSize);
             Assert.IsNotNull(results);
@@ -132,12 +133,12 @@ namespace Sharper.Tests
             var engine = REngine.GetInstance();
             ClrProxy.LoadAssembly(PATH);
 
-            var externalPtr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+            Assert.IsTrue(ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0, out var externalPtr));
 
             var sexp = engine.CreateCharacter("Test");
             ClrProxy.SetProperty(externalPtr, "Name", sexp.DangerousGetHandle().ToInt64());
 
-            var result = ClrProxy.GetProperty(externalPtr, "Name");
+            Assert.IsTrue(ClrProxy.GetProperty(externalPtr, "Name", out var result));
 
             Assert.AreEqual("Test", engine.CreateFromNativeSexp(new IntPtr(result)).AsCharacter()[0]);
         }
@@ -152,18 +153,18 @@ namespace Sharper.Tests
 
             var sexp = engine.CreateNumeric(0.0);
             var arguments = new[] { (long)sexp.DangerousGetHandle() };
-            ClrProxy.CallStaticMethod(typeName, "TryGetValue", arguments, arguments.Length, out var results, out var resultsSize);
+            Assert.IsTrue(ClrProxy.CallStaticMethod(typeName, "TryGetValue", arguments, arguments.Length, out var results, out var resultsSize));
             Assert.AreEqual(2, resultsSize);
             Assert.IsTrue(engine.CreateFromNativeSexp(new IntPtr(results[0])).AsLogical()[0]);
             Assert.AreEqual(12.4, engine.CreateFromNativeSexp(new IntPtr(results[1])).AsNumeric()[0]);
 
-            var ptr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+            Assert.IsTrue(ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0, out var ptr));
             arguments = new[] { ptr };
-            ClrProxy.CallStaticMethod(typeName, "TryGetObject", arguments, arguments.Length, out results, out resultsSize);
+            Assert.IsTrue(ClrProxy.CallStaticMethod(typeName, "TryGetObject", arguments, arguments.Length, out results, out resultsSize));
             Assert.AreEqual(2, resultsSize);
             Assert.IsTrue(engine.CreateFromNativeSexp(new IntPtr(results[0])).AsLogical()[0]);
 
-            var namePtr = ClrProxy.GetProperty(results[1], "Name");
+            Assert.IsTrue(ClrProxy.GetProperty(results[1], "Name", out var namePtr));
             Assert.AreEqual("Out object", engine.CreateFromNativeSexp(new IntPtr(namePtr)).AsCharacter()[0]);
         }
 
@@ -173,21 +174,21 @@ namespace Sharper.Tests
             const string typeName = "AssemblyForTests.StaticClass";
 
             var engine = REngine.GetInstance();
-            ClrProxy.LoadAssembly(PATH);
+            Assert.IsTrue(ClrProxy.LoadAssembly(PATH));
 
             var sexp = engine.CreateNumeric(1.0);
             var arguments = new[] { (long)sexp.DangerousGetHandle() };
-            ClrProxy.CallStaticMethod(typeName, "UpdateValue", arguments, arguments.Length, out var results, out var resultsSize);
+            Assert.IsTrue(ClrProxy.CallStaticMethod(typeName, "UpdateValue", arguments, arguments.Length, out var results, out var resultsSize));
             Assert.AreEqual(2, resultsSize);
             Assert.AreEqual(engine.NilValue, engine.CreateFromNativeSexp(new IntPtr(results[0])));
             Assert.AreEqual(2, engine.CreateFromNativeSexp(new IntPtr(results[1])).AsNumeric()[0]);
 
-            var ptr = ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0);
+            Assert.IsTrue(ClrProxy.CreateObject("AssemblyForTests.DefaultCtorData", null, 0, out var ptr));
             arguments = new[] { ptr };
-            ClrProxy.CallStaticMethod(typeName, "UpdateObject", arguments, arguments.Length, out results, out resultsSize);
+            Assert.IsTrue(ClrProxy.CallStaticMethod(typeName, "UpdateObject", arguments, arguments.Length, out results, out resultsSize));
             Assert.AreEqual(2, resultsSize);
             Assert.AreEqual(engine.NilValue, engine.CreateFromNativeSexp(new IntPtr(results[0])));
-            var namePtr = ClrProxy.GetProperty(results[1], "Name");
+            Assert.IsTrue(ClrProxy.GetProperty(results[1], "Name", out var namePtr));
             Assert.AreEqual("Ref object", engine.CreateFromNativeSexp(new IntPtr(namePtr)).AsCharacter()[0]);
         }
 

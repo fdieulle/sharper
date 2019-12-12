@@ -75,16 +75,16 @@ protected:
 	uint32_t _domainId;
 
 	virtual const char* getLastError() = 0;
-	virtual void loadAssembly(const char* filePath) = 0;
-	virtual void callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
-	virtual int64_t getStaticProperty(const char* typeName, const char* propertyName) = 0;
-	virtual void setStaticProperty(const char* typeName, const char* propertyName, int64_t value) = 0;
+	virtual bool loadAssembly(const char* filePath) = 0;
+	virtual bool callStaticMethod(const char* typeName, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
+	virtual bool getStaticProperty(const char* typeName, const char* propertyName, int64_t* value) = 0;
+	virtual bool setStaticProperty(const char* typeName, const char* propertyName, int64_t value) = 0;
 	
-	virtual int64_t createObject(const char* typeName, int64_t* args, int32_t argsSize) = 0;
+	virtual bool createObject(const char* typeName, int64_t* args, int32_t argsSize, int64_t* value) = 0;
 	virtual void registerFinalizer(SEXP sexp) = 0;
-	virtual void callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
-	virtual int64_t getProperty(int64_t objectPtr, const char* propertyName) = 0;
-	virtual void setProperty(int64_t objectPtr, const char* propertyName, int64_t value) = 0;
+	virtual bool callMethod(int64_t objectPtr, const char* methodName, int64_t* args, int32_t argsSize, int64_t** results, int32_t* resultsSize) = 0;
+	virtual bool getProperty(int64_t objectPtr, const char* propertyName, int64_t* value) = 0;
+	virtual bool setProperty(int64_t objectPtr, const char* propertyName, int64_t value) = 0;
 private:
 
 	char* readStringFromSexp(SEXP p);

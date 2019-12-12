@@ -11,14 +11,8 @@ ClrHost::~ClrHost()
 
 void ClrHost::rloadAssembly(char** filePath)
 {
-	try
-	{
-		loadAssembly(filePath[0]);
-	}
-	catch (...)
-	{
+	if (!loadAssembly(filePath[0]))
 		Rf_error(getLastError());
-	}
 }
 
 SEXP ClrHost::rCallStaticMethod(SEXP p)
@@ -33,17 +27,16 @@ SEXP ClrHost::rCallStaticMethod(SEXP p)
 	// 2 - Call delegate on clr runtime
 	int64_t* results;
 	int32_t resultsSize;
-	try
-	{
-		callStaticMethod(typeName, methodName, args, argsSize, &results, &resultsSize);
-	}
-	catch (...)
+	
+	bool isOk = callStaticMethod(typeName, methodName, args, argsSize, &results, &resultsSize);
+	
+	delete[] args;
+
+	if (!isOk)
 	{
 		Rf_error(getLastError());
 		return R_NilValue;
 	}
-
-	delete[] args;
 	
 	// 3 - Convert and return the result
 	return WrapResults(results, resultsSize);
@@ -57,11 +50,8 @@ SEXP ClrHost::rGetStaticProperty(SEXP p)
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
 
 	int64_t result;
-	try 
-	{
-		result = getStaticProperty(typeName, propertyName);
-	}
-	catch (...)
+	
+	if(!getStaticProperty(typeName, propertyName, &result))
 	{
 		Rf_error(getLastError());
 		return R_NilValue;
@@ -78,14 +68,9 @@ void ClrHost::rSetStaticProperty(SEXP p)
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
 	int64_t value = (int64_t)CAR(p);
 
-	try 
-	{
-		setStaticProperty(typeName, propertyName, value);
-	}
-	catch (...) 
-	{
+	if (!setStaticProperty(typeName, propertyName, value))
 		Rf_error(getLastError());
-	}
+
 }
 
 SEXP ClrHost::rCreateObject(SEXP p)
@@ -99,17 +84,15 @@ SEXP ClrHost::rCreateObject(SEXP p)
 	int64_t* args = readParametersFromSexp(p, argsSize);
 
 	int64_t result;
-	try 
-	{
-		result = createObject(typeName, args, argsSize);
-	}
-	catch (...) 
+	bool isOk = createObject(typeName, args, argsSize, &result);
+
+	delete[] args;
+
+	if(!isOk)
 	{
 		Rf_error(getLastError());
 		return R_NilValue;
 	}
-
-	delete[] args;
 
 	return WrapResult(result);
 }
@@ -128,17 +111,16 @@ SEXP ClrHost::rCallMethod(SEXP p)
 	// 3 - Call delegate on clr runtime
 	int64_t* results;
 	int32_t resultsSize;
-	try 
-	{
-		callMethod(objectPtr, methodName, args, argsSize, &results, &resultsSize);
-	}
-	catch (...) 
+	
+	bool isOk = callMethod(objectPtr, methodName, args, argsSize, &results, &resultsSize);
+
+	delete[] args;
+
+	if (!isOk)
 	{
 		Rf_error(getLastError());
 		return R_NilValue;
 	}
-
-	delete[] args;
 
 	// 4 - Convert and return the result
 	return WrapResults(results, resultsSize);
@@ -152,11 +134,7 @@ SEXP ClrHost::rGetProperty(SEXP p)
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
 
 	int64_t result;
-	try
-	{
-		result = getProperty(objectPtr, propertyName);
-	}
-	catch (...)
+	if (!getProperty(objectPtr, propertyName, &result))
 	{
 		Rf_error(getLastError());
 		return R_NilValue;
@@ -173,14 +151,8 @@ void ClrHost::rSetProperty(SEXP p)
 	const char* propertyName = readStringFromSexp(p); p = CDR(p);
 	int64_t value = (int64_t)CAR(p);
 
-	try
-	{
-		setProperty(objectPtr, propertyName, value);
-	}
-	catch (...)
-	{
+	if (!setProperty(objectPtr, propertyName, value))
 		Rf_error(getLastError());
-	}
 }
 
 char * ClrHost::readStringFromSexp(SEXP p)
