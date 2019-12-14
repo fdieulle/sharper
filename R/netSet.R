@@ -31,5 +31,5 @@
 #'
 #' }
 netSet <- function(x, propertyName, value) {
-  invisible(.External("rSetProperty", x, propertyName, value, PACKAGE = 'sharper'))
+  invisible(.External("rSetProperty", x, propertyName, netUnwrap(value), PACKAGE = 'sharper'))
 }

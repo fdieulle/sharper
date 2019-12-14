@@ -37,5 +37,5 @@
 #' netGetStatic(type, "Int32ArrayProperty")
 #' }
 netSetStatic <- function(typeName, propertyName, value) {
-  invisible(.External("rSetStaticProperty", typeName, propertyName, value, PACKAGE = 'sharper'))
+  invisible(.External("rSetStaticProperty", typeName, propertyName, netUnwrap(value), PACKAGE = 'sharper'))
 }

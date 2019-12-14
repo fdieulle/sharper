@@ -346,6 +346,23 @@ namespace Sharper
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
+        public static string[] GetHierarchyTypeNames(object instance)
+        {
+            if (instance == null) return new string[0];
+
+            var type = instance.GetType();
+            var typeNames = new List<string>();
+
+            while (type != null && type != typeof(object))
+            {
+                typeNames.Add(type.Name);
+                type = type.BaseType;
+            }
+
+            return typeNames.ToArray();
+        }
+        
         #region Manage errors
         private static readonly StringBuilder lastErrors = new StringBuilder();
         private static void LogExceptions(string message, Exception e)

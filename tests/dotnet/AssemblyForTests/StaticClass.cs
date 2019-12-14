@@ -83,6 +83,14 @@ namespace AssemblyForTests
         public static TimeSpan[] ReturnsNativeType(TimeSpan[] x) => x;
         public static TimeSpan[,] ReturnsNativeType(TimeSpan[,] x) => x;
 
+        public static DefaultCtorData Clone(DefaultCtorData data) => data?.Clone();
+
+        public static double[,] Clone(DefaultCtorData data, double[,] matrix, out DefaultCtorData clone)
+        {
+            clone = data?.Clone();
+            return matrix;
+        } 
+
         #endregion
 
         #region Properties

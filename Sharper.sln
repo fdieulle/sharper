@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{3E219373-D6C9-46
 		R\netObject.R = R\netObject.R
 		R\netSet.R = R\netSet.R
 		R\netSetStatic.R = R\netSetStatic.R
+		R\netUnwrap.R = R\netUnwrap.R
+		R\netWrap.R = R\netWrap.R
 		R\start_clr.R = R\start_clr.R
 		R\zzz.R = R\zzz.R
 	EndProjectSection
@@ -53,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testthat", "testthat", "{B9
 	ProjectSection(SolutionItems) = preProject
 		tests\testthat\test-callInstanceMethod.R = tests\testthat\test-callInstanceMethod.R
 		tests\testthat\test-callStaticMethod.R = tests\testthat\test-callStaticMethod.R
+		tests\testthat\test-netObject.R = tests\testthat\test-netObject.R
 	EndProjectSection
 EndProject
 Global

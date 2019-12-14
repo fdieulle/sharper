@@ -1,12 +1,28 @@
 ﻿namespace AssemblyForTests
 {
-    public class DefaultCtorData
+    public interface IData
+    {
+        string Name { get; }
+    }
+
+    public class DefaultCtorData : IData
     {
         public string Name { get; set; }
 
         public int[] Integers { get; set; }
 
         public OneCtorData OneCtorData { get; set; }
+
+        public DefaultCtorData Clone()
+        {
+            return (DefaultCtorData)MemberwiseClone();
+        }
+
+        public double[,] Clone(double[,] matrix, out DefaultCtorData clone)
+        {
+            clone = Clone();
+            return matrix;
+        }
 
         #region Method with out arguments
 
@@ -37,47 +53,54 @@
 
     public class OneCtorData
     {
-        private readonly int _id;
+        public int Id { get; set; }
 
         public OneCtorData(int id)
         {
-            _id = id;
+            Id = id;
         }
 
         public override string ToString()
         {
-            return $"{base.ToString()} #{_id}";
+            return $"{base.ToString()} #{Id}";
         }
     }
 
-    public class ManyCtorData
+    public class ManyCtorData : IData
     {
-        private readonly int _id;
-        private readonly string _name;
-
-        public int Id => _id;
-        public string Name => _name;
+        public int Id { get; }
+        public string Name { get; }
 
         public ManyCtorData()
         {
-            _id = -1;
-            _name = "Default ctor #" + _id;
+            Id = -1;
+            Name = "Default ctor #" + Id;
         }
 
         public ManyCtorData(int id)
         {
-            _id = id;
-            _name = "Integer ctor #" + id;
+            Id = id;
+            Name = "Integer ctor #" + id;
         }
 
         public ManyCtorData(string name)
         {
-            _name = "String Ctor " + name;
+            Name = "String Ctor " + name;
+        }
+
+        public ManyCtorData(string name, int id)
+        {
+            Name = "String Ctor " + name;
         }
 
         public override string ToString()
         {
-            return $"{base.ToString()} Name={_name}, Id={_id}";
+            return $"{base.ToString()} Name={Name}, Id={Id}";
         }
+    }
+
+    public class InheritedType : DefaultCtorData
+    {
+        public int Id { get; set; }
     }
 }

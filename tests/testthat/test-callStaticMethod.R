@@ -1,4 +1,11 @@
+library(sharper)
+library(testthat)
+
 context("call static methods")
+
+package_folder = path.package("sharper")
+assembly_file <- file.path(package_folder, "tests", "AssemblyForTests.dll")
+netLoadAssembly(assembly_file)
 
 test_that("Call the same static method with different signatures", {
 	typeName = "AssemblyForTests.StaticClass"
@@ -151,4 +158,69 @@ test_that("Call static method with ref argument", {
   object <- NULL
   netCallStatic(typeName, "UpdateObject", object)
   expect_equal(netGet(object, "Name"), "Ref object")
+})
+
+test_that("Call static method with wrap", {
+  type = "AssemblyForTests.StaticClass"
+  method = "ReturnsNativeType"
+  
+  result <- netCallStatic(type, method, 2.1, wrap = TRUE)
+  expect_equal(result, 2.1)
+  result <- netCallStatic(type, method, c(2.1, 3.1, 4.1), wrap = TRUE)
+  expect_equal(result, c(2.1, 3.1, 4.1))
+  result <- netCallStatic(type, method, matrix(nrow = 7, ncol = 3, data = 5.1), wrap = TRUE)
+  expect_equal(result, matrix(nrow = 7, ncol = 3, data = 5.1))
+  
+  parameter <- 2.1
+  result <- netCallStatic(type, method, parameter, wrap = TRUE)
+  expect_equal(result, parameter)
+  parameter <- c(2.1, 3.1, 4.1)
+  result <- netCallStatic(type, method, parameter, wrap = TRUE)
+  expect_equal(result, parameter)
+  parameter <- matrix(nrow = 7, ncol = 3, data = 5.1)
+  result <- netCallStatic(type, method, parameter, wrap = TRUE)
+  expect_equal(result, parameter)
+  
+  x <- netNew("AssemblyForTests.DefaultCtorData")
+  netSet(x, "Name", "Test")
+  object <- NetObject$new(ptr = x)
+  
+  result <- netCallStatic(type, "Clone", x)
+  expect_true(inherits(result, "externalptr"))
+  expect_equal(netGet(result, "Name"), "Test")
+  
+  result <- netCallStatic(type, "Clone", object)
+  expect_true(inherits(result, "externalptr"))
+  expect_equal(netGet(result, "Name"), "Test")
+  
+  result <- netCallStatic(type, "Clone", x, wrap = TRUE)
+  expect_true(inherits(result, "NetObject"))
+  expect_equal(netGet(result, "Name"), "Test")
+  
+  result <- netCallStatic(type, "Clone", object, wrap = TRUE)
+  expect_true(inherits(result, "NetObject"))
+  expect_equal(netGet(result, "Name"), "Test")
+  
+  parameter <- matrix(nrow = 7, ncol = 3, data = 5.1)
+  out_x = x
+  result <- netCallStatic(type, "Clone", x, parameter, out_x)
+  expect_equal(result, parameter)
+  expect_true(inherits(out_x, "externalptr"))
+  expect_equal(netGet(out_x, "Name"), "Test")
+  
+  out_object = object
+  result <- netCallStatic(type, "Clone", object, parameter, out_object)
+  expect_equal(result, parameter)
+  expect_true(inherits(out_object, "externalptr"))
+  expect_equal(netGet(out_object, "Name"), "Test")
+  
+  result <- netCallStatic(type, "Clone", x, parameter, out_x, wrap = TRUE)
+  expect_equal(result, parameter)
+  expect_true(inherits(out_x, "NetObject"))
+  expect_equal(out_x$get("Name"), "Test")
+  
+  result <- netCallStatic(type, "Clone", object, parameter, out_object, wrap = TRUE)
+  expect_equal(result, parameter)
+  expect_true(inherits(out_object, "NetObject"))
+  expect_equal(out_object$get("Name"), "Test")
 })
