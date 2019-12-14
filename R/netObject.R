@@ -80,8 +80,18 @@ NetObject <- R6Class(
     getType = function() {
       return(private$type)
     },
-    print = function() {
-      # Todo
+    print = function(...) {
+      classes <- class(self)
+      for (i in seq_along(tail(classes, -1))) {
+        cat(classes[[i]], ": \n")
+        propertyNames <- names(get(classes[[i]])$active)
+        for(name in propertyNames) {
+          value <- eval(parse(text = paste0("self$", name)))
+          if (inherits(value, "externalptr"))
+            value <- "externalptr"
+          cat("  ", name, ": ", value, "\n")  
+        }
+      }
     }
   )
 )
