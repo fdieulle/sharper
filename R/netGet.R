@@ -7,7 +7,7 @@
 #' @param x .Net object
 #' @param propertyName Property name to get value
 #' @param wrap Specify if you want to wrap `externalptr` .Net object into `NetObject` `R6` object. `FALSE`` by default.
-#' @return Returns the .Net result. 
+#' @return Returns the .Net property value. 
 #' If a converter has been defined between the .Net type and a `R` type, the `R` type will be returned.
 #' Otherwise an `externalptr` or a `NetObject` if `wrap` is set to `TRUE`.
 #' 

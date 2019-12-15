@@ -23,6 +23,7 @@
 #' 		* `dotnet` - the `Microsoft.NETCore.App` shared runtime.
 #' 		* `aspnetcore` - the `Microsoft.AspNetCore.App` shared runtime.
 #'
+#' @md
 #' @export
 #' @examples
 #' \dontrun{

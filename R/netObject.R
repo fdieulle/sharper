@@ -1,24 +1,9 @@
-#' @title
 #' NetObject class
 #'
 #' @description
-#' NetObject class to wrap a .Net external pointer
-#'
-#' @section Properties:
-#'
-#' * `Ptr`: External pointer of the wrapped .Net object
-#'
-#' @section Methods:
-#'
-#' * `get(propertyName)`: Gets a property value
-#' * `set(propertyName, value)`: Sets a property value
-#' * `call(methodName, ...)`: Call a method
-#' * `unwrap(value)`: Unwrap any NetObject or collection of NetObjects to external pointers
-#' * `as(className)`: Cast the current R6 class to another by keeping the same .Net pointer
-#' * `getType()`: Gets `NetType` description of wrapped .Net object
-#'
+#' NetObject R6 class to wrap an `externalptr``which represent a .Net object.
+#' 
 #' @md
-#' @export
 #' @examples
 #' \dontrun{
 #' library(sharper)
@@ -37,6 +22,8 @@ NetObject <- R6Class(
     type = NULL
   ),
   active = list(
+    
+    #' @field Ptr `externalptr` of the wrapped .Net object
     Ptr = function(value) {
       if (missing(value))
         return(private$ptr)
@@ -45,6 +32,25 @@ NetObject <- R6Class(
     }
   ),
   public = list(
+    
+    #' @description 
+    #' Create a new NetObject.
+    #' 
+    #' @param typeName .Net full type name.
+    #' @param ptr `externalptr` of the .Net object.
+    #' @param ... Property setters
+    #' @return A new wrapped .Net object.
+    #' 
+    #' @details 
+    #' You can use 2 ways to instanciate a .NetObject.
+    #' If you specify the `externalptr` through the `ptr` parameter, 
+    #' this pointer will be wrapped and stored into the `Ptr` active binding.
+    #' Otherwise if your .Net class has a default constructor you can specify the `typeName`
+    #' and a `netNew(typeName)` will be proceed to fill the `Ptr` active binding.
+    #' 
+    #' The ellipsis parameter can be use to setup the .Net properties. This feature
+    #' works with both building ways.
+    #' You can use it as follow `o <- NetObject$new(typeName, Name = "My name", Id = 1L)`
     initialize = function(typeName = NULL, ptr = NULL, ...) {
       
       if (!is.null(ptr) && inherits(ptr, "externalptr")) {
@@ -65,21 +71,110 @@ NetObject <- R6Class(
         }
       }
     },
+    
+    #' @description 
+    #' Gets a property value
+    #' 
+    #' @param propertyName Property name
+    #' @param wrap Specify if you want to wrap a `externalptr` .Net object into a `NetObject` object. `TRUE`` by default.
+    #' @return Returns the .Net property value. 
+    #' If a converter has been defined between the .Net type and a `R` type, the `R` type will be returned.
+    #' Otherwise an `externalptr` or a `NetObject` if `wrap` is set to `TRUE`.
+    #' 
+    #' @details
+    #' Allows you to get a property value for a .Net object.
+    #' The result will be converted if the type mapping is defined. All native C# types are mapped to R types
+    #' but you can define custom converters in C# for that see the C# `RDotNetConverter` class.
+    #' 
+    #' By default `wrap` is set to `TRUE`. If there is no native convertion found between .Net type and R type, 
+    #' the result is wrapped into `NetObject` instance.
+    #' A best `R6` type can be chosen if this type exists. This `R6` class has to inherit from `NetObject` 
+    #' and has to have the same name than the C# class. You can generate automatically this inherited class.
+    #' For more details about this feature please see the `netGenerateR6` function. 
+    #' If you prefer get a raw `externalptr` to the .Net object,
+    #' 
+    #' This function is aquivalent to call `netGet(o$Ptr, propertyName)`
     get = function (propertyName, wrap = TRUE) {
       return(netGet(private$ptr, propertyName, wrap = wrap))
     },
+    
+    #' @description 
+    #' Sets a property value
+    #' 
+    #' @param propertyName Property name.
+    #' @param value value to set
+    #' 
+    #' @details
+    #' Allows you to set a property value of a .Net object.
+    #' The input value will be converted from R type to a .Net type. 
+    #' 
+    #' If the property value isn't a native C# type or a mapped conversion type,
+    #' you have to use an `externalptr` on .Net object or a `NetObject R6` instance.
+    #' 
+    #' You can define custom converters in C# for that see `RDotNetConverter` C# class.
+    #' 
+    #' This function is aquivalent to call `netSet(o$Ptr, propertyName, value)`.
     set = function (propertyName, value) {
       invisible(netSet(private$ptr, propertyName, value))
     },
-    call = function(methodName, ..., wrap = TRUE) {
-      return(netCall(private$ptr, methodName, ..., wrap = wrap, out_env = parent.frame()))
+    
+    #' @description
+    #' Call a .Net method member.
+    #' 
+    #' @param methodName Method name
+    #' @param ... Method arguments
+    #' @param wrap Specify if you want to wrap `externalptr` .Net object into `NetObject` `R6` object. `TRUE`` by default.
+    #' @param out_env In case of .Net method with `out` or `ref` argument, 
+    #' specify on which `environment` you want to out put this arguments. 
+    #' By default it's the caller `environment` i.e. `parent.frame()`.
+    #' @return Returns the .Net result. 
+    #' If a converter has been defined between the .Net type and a `R` type, the `R` type will be returned.
+    #' Otherwise an `externalptr` or a `NetObject` if `wrap` is set to `TRUE`.
+    #' 
+    #' @details
+    #' Call a method member for a given .Net object.
+    #' Ellipses has to keep the .Net arguments method order, the named arguments are not yet supported.
+    #' If there is collisions with a method name (many definition in .Net), the best matched will be chosen.
+    #' A score is computed from your arguments orders and types. We consider as higher priority single value compare to collection of values.
+    #' 
+    #' If you decide to set `wrap` to `TRUE` this function supports the `NetObject R6` class and all inherited.
+    #' The function result if no converter has been found will return a `NetObject` of an inherited best type 
+    #' instead of a raw `externalptr`. For more details about inherited `NetObject` class please see `netGenerateR6` function. 
+    #' 
+    #' The `out_env` is usefull when the callee .Net method has some `out` or `ref` argument.
+    #' Because in .Net this argument set the given variable in the caller scope. We reflect this
+    #' mechanism by default by modifying the givent variables in the parent `R environment` which means
+    #' the caller or `parent.frame()`. You can decide where redirect the varaibles value by specifying another argument.
+    #' 
+    #' This function is aquivalent to call `netCall(o$Ptr, methodName)`.
+    call = function(methodName, ..., wrap = TRUE, out_env = parent.frame()) {
+      return(netCall(private$ptr, methodName, ..., wrap = wrap, out_env = out_env))
     },
+    
+    #' @description 
+    #' Cast the current R6 class to another.
+    #' 
+    #' @param className `R6` class name to cast.
+    #' @return a new `R6` instance of type `className`.
+    #'  
+    #' @details
+    #' If the `R6` `className` already exists the wrapped `externalptr` 
+    #' which represents a .Net object will be transfer to a new `R6` 
+    #' instance of type `className`.
     as = function(className) {
       return(get(className)$new(ptr = private$ptr))
     },
+    
+    #' @description 
+    #' Gets `NetType` description of wrapped .Net object
     getType = function() {
       return(private$type)
     },
+    
+    #' @description 
+    #' Print the object
+    #' 
+    #' @param ... .
     print = function(...) {
       classes <- class(self)
       for (i in seq_along(tail(classes, -1))) {
@@ -130,16 +225,19 @@ NetType <- R6Class(
     fullName = NULL
   ),
   active = list(
+    #' @field Name .Net type name.
     Name = function(value) {
       if (missing(value)) {
         return(private$name)
       }
     },
+    #' @field Namespace namespace of .Net type.
     Namespace = function(value) {
       if (missing(value)) {
         return(private$namespace)
       }
     },
+    #' @field Full .Net type name
     FullName = function(value) {
       if (missing(value)) {
         return(private$fullName)
@@ -147,11 +245,18 @@ NetType <- R6Class(
     }
   ),
   public = list(
+    #' @description
+    #' Create a new NetType object.
+    #' @param namespace Namespace namespace of .Net type.
+    #' @param name .Net type name.
     initialize = function(namespace, name) {
       private$namespace = namespace
       private$name = name
       private$fullName = paste(namespace, name, sep = ".")
     },
+    #' @description 
+    #' Create a new .Net object and wrap it.
+    #' @param ... Ctor arguments of the .Net type
     createObject = function(...) {
       return (NetObject$new(ptr = netNew(private$fullName, ...)))
     }

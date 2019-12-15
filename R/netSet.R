@@ -9,10 +9,13 @@
 #' @param value value to set.
 #' 
 #' @details
-#' Allows you to set a property value for a .Net object.
+#' Allows you to set a property value of a .Net object.
 #' The input value will be converted from R type to a .Net type. 
-#' If the property value isn't a native C# type or a mapped conversion type you have to use an external pointer on .Net object.
-#' You can define custom converters in C# for that see `RDotNetConverter` class.
+#' 
+#' If the property value isn't a native C# type or a mapped conversion type,
+#' you have to use an `externalptr` on .Net object or a `NetObject R6` instance.
+#' 
+#' You can define custom converters in C# for that see `RDotNetConverter` C# class.
 #' 
 #' @export
 #' @examples
