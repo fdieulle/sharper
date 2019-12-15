@@ -45,7 +45,7 @@ NetObject <- R6Class(
     }
   ),
   public = list(
-    initialize = function(ptr = NULL, typeName = NULL, ...) {
+    initialize = function(typeName = NULL, ptr = NULL, ...) {
       
       if (!is.null(ptr) && inherits(ptr, "externalptr")) {
         private$ptr <- ptr
@@ -65,14 +65,14 @@ NetObject <- R6Class(
         }
       }
     },
-    get = function (propertyName) {
-      return(netGet(private$ptr, propertyName, wrap = TRUE))
+    get = function (propertyName, wrap = TRUE) {
+      return(netGet(private$ptr, propertyName, wrap = wrap))
     },
     set = function (propertyName, value) {
       invisible(netSet(private$ptr, propertyName, value))
     },
-    call = function(methodName, ...) {
-      return(netCall(private$ptr, methodName, ..., wrap = TRUE, out_env = parent.frame()))
+    call = function(methodName, ..., wrap = TRUE) {
+      return(netCall(private$ptr, methodName, ..., wrap = wrap, out_env = parent.frame()))
     },
     as = function(className) {
       return(get(className)$new(ptr = private$ptr))
