@@ -15,6 +15,15 @@ namespace Sharper
 
         private static readonly Type[] defaultTypeArray = { typeof(object) };
 
+        public static Type AsType(this string typeName)
+        {
+            if (TryGetType(typeName, out var type, out var errorMsg))
+                return type;
+
+            // Todo: logger.ErrorFormat("Unable to get type: {0}, {1}", typeName, errorMsg);
+            return null;
+        }
+
         public static bool TryGetType(this string typeName, out Type type, out string errorMsg)
         {
             errorMsg = null;
@@ -205,8 +214,7 @@ namespace Sharper
 
             return result;
         }
-
-
+        
         #endregion
 
         public static bool TryGetMethod(this Type type,

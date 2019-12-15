@@ -6,6 +6,25 @@
 
   <ItemGroup>
     <None Remove="Converters\Resources\WindowsZones.xml" />
+    <None Remove="R6\Templates\R6Class-Template.R" />
+    <None Remove="R6\Templates\R6Ctor-Template.R" />
+    <None Remove="R6\Templates\R6Method-Template.R" />
+    <None Remove="R6\Templates\R6Property-Template.R" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="R6\Templates\R6Class-Template.R">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="R6\Templates\R6Ctor-Template.R">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="R6\Templates\R6Method-Template.R">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="R6\Templates\R6Property-Template.R">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

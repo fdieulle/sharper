@@ -362,7 +362,20 @@ namespace Sharper
 
             return typeNames.ToArray();
         }
-        
+
+        // ReSharper disable once UnusedMember.Global
+        public static void GenerateR6Classes(string[] typeNames, string file, bool appendFile = false, bool withInheritedTypes = false)
+        {
+            try
+            {
+                R6Generator.GenerateR6Classes(typeNames, file, DataConverter, appendFile, withInheritedTypes);
+            }
+            catch (Exception e)
+            {
+                LogExceptions("[GenerateR6Classes]", e);
+            }
+        }
+
         #region Manage errors
         private static readonly StringBuilder lastErrors = new StringBuilder();
         private static void LogExceptions(string message, Exception e)

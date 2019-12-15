@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "R", "R", "{3E219373-D6C9-46
 		R\install_dotnet_core.R = R\install_dotnet_core.R
 		R\netCall.R = R\netCall.R
 		R\netCallStatic.R = R\netCallStatic.R
+		R\netGenerateR6.R = R\netGenerateR6.R
 		R\netGet.R = R\netGet.R
 		R\netGetStatic.R = R\netGetStatic.R
 		R\netLoadAssembly.R = R\netLoadAssembly.R

@@ -192,6 +192,26 @@ namespace Sharper.Tests
             Assert.AreEqual("Ref object", engine.CreateFromNativeSexp(new IntPtr(namePtr)).AsCharacter()[0]);
         }
 
+        [Test]
+        public void TestGenerateR6Classes()
+        {
+            var engine = REngine.GetInstance();
+            ClrProxy.LoadAssembly(PATH);
+
+            var filePath = $"{Guid.NewGuid():N}.R";
+
+            try
+            {
+                ClrProxy.GenerateR6Classes(new[] { "AssemblyForTests.OneCtorData" }, filePath);
+                engine.Evaluate($"source('{Path.GetFullPath(filePath).Replace("\\", "/")}')");
+            }
+            finally
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+        }
+
         private static IConverter C(Type type)
         {
             var converter = Substitute.For<IConverter>();
