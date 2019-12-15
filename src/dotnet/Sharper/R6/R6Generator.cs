@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Sharper.Converters;
 
 namespace Sharper.R6
@@ -66,14 +67,19 @@ namespace Sharper.R6
         {
             var properties = new List<string>();
             foreach (var property in type.GetPublicProperties())
-                properties.Add(r6PropertyTemplate.Replace("{{PropertyName}}", property.Name));
+                properties.Add(r6PropertyTemplate
+                    .Replace("{{PropertyName}}", property.Name)
+                    .Replace("{{Description}}", property.GetDescription()));
 
             var ctorParameters = type.GetCtorParameters();
             var ctor = r6CtorTemplate
-                .Replace("{{parameters}}", ctorParameters.GenerateR6Parameters())
-                .Replace("{{comma}}", ctorParameters.GenerateComma())
+                .Replace("{{Parameters}}", ctorParameters.GenerateR6Parameters())
+                .Replace("{{Comma}}", ctorParameters.GenerateComma())
                 .Replace("{{FullTypeName}}", type.FullName)
-                .Replace("{{CanBeInstantiated}}", (!type.IsAbstract && !type.IsInterface).ToString().ToUpper());
+                .Replace("{{CanBeInstantiated}}", (!type.IsAbstract && !type.IsInterface).ToString().ToUpper())
+                .Replace("{{Description}}", type.GetDescription())
+                .Replace("{{Parameters_doc}}", ctorParameters.GenerateR6ParametersDoc())
+                .Replace("{{Return_doc}}", $"A new instance of {type.Name}");
 
             var methods = new List<string>();
             foreach (var method in type.GetPublicMethods())
@@ -81,9 +87,12 @@ namespace Sharper.R6
                 var methodParameters = method.GetParameters();
                 methods.Add(r6MethodTemplate
                     .Replace("{{MethodName}}", method.Name)
-                    .Replace("{{parameters}}", methodParameters.GenerateR6Parameters())
-                    .Replace("{{comma}}", methodParameters.GenerateComma())
-                    .Replace("{{Return}}", method.ReturnType == typeof(void) ? "invisible" : "return"));
+                    .Replace("{{Parameters}}", methodParameters.GenerateR6Parameters())
+                    .Replace("{{Comma}}", methodParameters.GenerateComma())
+                    .Replace("{{Return}}", method.ReturnType == typeof(void) ? "invisible" : "return")
+                    .Replace("{{Description}}", type.GetDescription())
+                    .Replace("{{Parameters_doc}}", ctorParameters.GenerateR6ParametersDoc())
+                    .Replace("{{Return_doc}}", method.ReturnType == typeof(void) ? "nothing" : "the result"));
             }
 
             var r6Class = r6ClassTemplate
@@ -91,8 +100,9 @@ namespace Sharper.R6
                 .Replace("{{InheritTypeName}}", allTypes.Contains(type.BaseType) ? type.BaseType.Name : "NetObject")
                 .Replace("{{Properties}}", string.Join($",{Environment.NewLine}", properties))
                 .Replace("{{Ctor}}", ctor)
-                .Replace("{{comma}}", methods.GenerateComma())
-                .Replace("{{Methods}}", string.Join($",{Environment.NewLine}", methods));
+                .Replace("{{Comma}}", methods.GenerateComma())
+                .Replace("{{Methods}}", string.Join($",{Environment.NewLine}", methods))
+                .Replace("{{Description}}", type.GetDescription());
             return r6Class;
         }
 
@@ -103,6 +113,18 @@ namespace Sharper.R6
 
         private static string GenerateComma<T>(this IEnumerable<T> source) 
             => source.Any() ? "," : string.Empty;
+
+        private static string GenerateR6ParametersDoc(this ParameterInfo[] parameters)
+        {
+            var sb = new StringBuilder();
+            foreach (var parameter in parameters)
+            {
+                sb.AppendLine();
+                sb.AppendFormat("#' @param {0} ", parameter.Name);
+            }
+
+            return sb.ToString();
+        }
 
         #region Search and Collect types
 
@@ -259,6 +281,13 @@ namespace Sharper.R6
             return candidate != null 
                 ? candidate.GetParameters() 
                 : new ParameterInfo[0];
+        }
+
+        private static string GetDescription(this MemberInfo member)
+        {
+            var attribute = member.GetCustomAttribute<DescriptionAttribute>();
+            return attribute == null || string.IsNullOrEmpty(attribute.Description)
+                ? member.Name : attribute.Description;
         }
 
         #endregion
