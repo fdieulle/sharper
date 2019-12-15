@@ -5,7 +5,6 @@ using NSubstitute;
 using NUnit.Framework;
 using RDotNet;
 using Sharper.Converters;
-using Sharper.Converters.RDotNet;
 
 namespace Sharper.Tests
 {

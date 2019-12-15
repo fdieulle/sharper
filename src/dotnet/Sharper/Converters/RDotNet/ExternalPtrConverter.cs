@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using RDotNet;
 
@@ -70,7 +69,7 @@ namespace Sharper.Converters.RDotNet
             {
                 var typeAsString = tag[1];
 
-                if (typeAsString.TryGetType(out var type, out var errorMessage))
+                if (typeAsString.TryGetType(out var type, out var _))
                     return type.GetFullHierarchy();
 
                 return new[] { typeof(object) };
