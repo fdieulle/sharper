@@ -10,13 +10,13 @@
 # SHLIB_EXT: the extension of shared objects
 # WINDOWS: TRUE on Windows, FALSE elsewhere
 
-print("Run install.libs.R script ...")
-print(paste0("R_PACKAGE_NAME: ", R_PACKAGE_NAME))
-print(paste0("R_PACKAGE_SOURCE: ", R_PACKAGE_SOURCE))
-print(paste0("R_PACKAGE_DIR: ", R_PACKAGE_DIR))
-print(paste0("R_ARCH: ", R_ARCH))
-print(paste0("SHLIB_EXT: ", SHLIB_EXT))
-print(paste0("WINDOWS: ", WINDOWS))
+#print("Run install.libs.R script ...")
+#print(paste0("R_PACKAGE_NAME: ", R_PACKAGE_NAME))
+#print(paste0("R_PACKAGE_SOURCE: ", R_PACKAGE_SOURCE))
+#print(paste0("R_PACKAGE_DIR: ", R_PACKAGE_DIR))
+#print(paste0("R_ARCH: ", R_ARCH))
+#print(paste0("SHLIB_EXT: ", SHLIB_EXT))
+#print(paste0("WINDOWS: ", WINDOWS))
 
 # Copy the c++ dll into package dir
 files <- Sys.glob(paste0("*", SHLIB_EXT))
@@ -25,7 +25,7 @@ print(sprintf("Copy the compiled C++ %s in %s", SHLIB_EXT, dest))
 dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
 
-configuration = "Debug"
+configuration = "Release"
 
 print("Publish the Sharper dotnet project")
 publish_cmd <- paste(
