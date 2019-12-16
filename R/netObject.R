@@ -4,6 +4,7 @@
 #' NetObject R6 class to wrap an `externalptr``which represent a .Net object.
 #' 
 #' @md
+#' @export
 #' @examples
 #' \dontrun{
 #' library(sharper)
