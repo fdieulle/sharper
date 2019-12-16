@@ -85,7 +85,7 @@ test_that("Generate inherited types from C# interface", {
   o$Name = "Updated property"
   expect_equal(o$Name, "Updated property")
   
-  o <- ManyCtorData$new(Name = "MyName", Id = 1.23)
+  o <- ManyCtorData$new(Name = "MyName", Id = 123L)
   expect_equal(o$Name, "MyName")
-  expect_equal(o$Id, 1.23)
+  expect_equal(o$Id, 123L)
 })
