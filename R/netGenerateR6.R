@@ -28,7 +28,7 @@
 #' 
 #' netGenerateR6("AssemblyForTests.OneCtorData", "AutoGenerate-Simple-R6.R")
 #' source("AutoGenerate-Simple-R6.R")
-#' o1 <- OneCtorData$new(10)
+#' o1 <- OneCtorData$new(10L)
 #' print(o1$Id)
 #' 
 #' netGenerateR6("AssemblyForTests.IData", "AutoGenerate-IData-R6.R", withInheritedTypes = TRUE)
