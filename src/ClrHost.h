@@ -38,6 +38,10 @@
 #include <Windows.h>
 #define FS_SEPERATOR "\\"
 #define PATH_DELIMITER ";"
+#ifdef ERROR
+#undef ERROR
+#endif
+
 #elif LINUX
 #include <dirent.h>
 #include <dlfcn.h>
