@@ -82,12 +82,14 @@ namespace Sharper.R6
                 .Replace("{{Return_doc}}", $"A new instance of {type.Name}");
 
             var methods = new List<string>();
+            var methodNameCounter = new Dictionary<string, int>(); 
             foreach (var method in type.GetPublicMethods())
             {
                 var methodParameters = method.GetParameters();
                 methods.Add(r6MethodTemplate
-                    .Replace("{{MethodName}}", method.Name)
+                    .Replace("{{MethodName}}", method.GetUniqueName(methodNameCounter))
                     .Replace("{{Parameters}}", methodParameters.GenerateR6Parameters())
+                    .Replace("{{HasByRefParams}}", methodParameters.Any(p => p.ParameterType.IsByRef).ToString().ToUpper())
                     .Replace("{{Comma}}", methodParameters.GenerateComma())
                     .Replace("{{Return}}", method.ReturnType == typeof(void) ? "invisible" : "return")
                     .Replace("{{Description}}", type.GetDescription())
@@ -295,6 +297,18 @@ namespace Sharper.R6
             var attribute = member.GetCustomAttribute<DescriptionAttribute>();
             return attribute == null || string.IsNullOrEmpty(attribute.Description)
                 ? member.Name : attribute.Description;
+        }
+
+        public static string GetUniqueName(this MethodInfo method, Dictionary<string, int> counters)
+        {
+            if (!counters.TryGetValue(method.Name, out var count))
+            {
+                counters.Add(method.Name, 1);
+                return method.Name;
+            }
+
+            counters[method.Name] = ++count;
+            return $"{method.Name}{count}";
         }
 
         #endregion
