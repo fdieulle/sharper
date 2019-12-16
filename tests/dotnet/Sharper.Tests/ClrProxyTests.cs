@@ -211,6 +211,47 @@ namespace Sharper.Tests
             }
         }
 
+        [Test]
+        public void TestGenerateR6ClassesWithOutArgs()
+        {
+            var engine = REngine.GetInstance();
+            ClrProxy.LoadAssembly(PATH);
+
+            var filePath = $"{Guid.NewGuid():N}.R";
+
+            try
+            {
+                ClrProxy.GenerateR6Classes(new[] { "AssemblyForTests.DefaultCtorData" }, filePath);
+                engine.Evaluate($"source('{Path.GetFullPath(filePath).Replace("\\", "/")}')");
+            }
+            finally
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+        }
+
+        [Test]
+        public void TestGenerateR6ClassesFromInterface()
+        {
+            var engine = REngine.GetInstance();
+            ClrProxy.LoadAssembly(PATH);
+
+            var filePath = $"{Guid.NewGuid():N}.R";
+
+            try
+            {
+                ClrProxy.GenerateR6Classes(new[] { "AssemblyForTests.IData" }, filePath);
+                engine.Evaluate($"source('{Path.GetFullPath(filePath).Replace("\\", "/")}')");
+            }
+            finally
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+        }
+
+
         private static IConverter C(Type type)
         {
             var converter = Substitute.For<IConverter>();

@@ -55,6 +55,8 @@
     {
         public int Id { get; set; }
 
+        public string Name { get; set; }
+
         public OneCtorData(int id)
         {
             Id = id;
@@ -68,8 +70,8 @@
 
     public class ManyCtorData : IData
     {
-        public int Id { get; }
-        public string Name { get; }
+        public int Id { get; set; }
+        public string Name { get; set; }
 
         public ManyCtorData()
         {
@@ -90,6 +92,7 @@
 
         public ManyCtorData(string name, int id)
         {
+            Id = id;
             Name = "String Ctor " + name;
         }
 
