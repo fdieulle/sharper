@@ -56,6 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testthat", "testthat", "{B9
 	ProjectSection(SolutionItems) = preProject
 		tests\testthat\test-callInstanceMethod.R = tests\testthat\test-callInstanceMethod.R
 		tests\testthat\test-callStaticMethod.R = tests\testthat\test-callStaticMethod.R
+		tests\testthat\test-netGenerateR6.R = tests\testthat\test-netGenerateR6.R
 		tests\testthat\test-netObject.R = tests\testthat\test-netObject.R
 	EndProjectSection
 EndProject
