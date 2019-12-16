@@ -249,6 +249,13 @@ namespace Sharper.R6
                 || (converter?.IsDefined(type) ?? false))
                 return false;
 
+            // Manage out and ref
+            if (type.IsByRef)
+            {
+                t = type.GetElementType();
+                return t.ShouldGenerateR6(converter);
+            }
+
             // Manage array
             if (type.IsArray)
             {
