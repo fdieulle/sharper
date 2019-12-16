@@ -1,11 +1,11 @@
-#' sharper .onLoad.
-#' 
-#' Function called when the sharper package is loading. 
-#' 
-#' @param pkgsDir package folder where the library is stored and loaded.
-#' @param pkgname package name.
-#' @rdname dotOnLoad
-#' @name dotOnLoad
+# sharper .onLoad.
+# 
+# Function called when the sharper package is loading. 
+# 
+# @param pkgsDir package folder where the library is stored and loaded.
+# @param pkgname package name.
+# @rdname dotOnLoad
+# @name dotOnLoad
 .onLoad <- function(pkgsDir='~/R', pkgname = 'sharper') {
 	pkgDir <- system.file(package = pkgname)
 	libsPath <- file.path(pkgDir, "libs")
@@ -21,14 +21,14 @@
 	}
 }
 
-#' sharper .onLoad.
-#' 
-#' Function called when the sharper package is loading. 
-#' 
-#' @param pkgsDir package folder where the library is stored and loaded.
-#' @param pkgname package name.
-#' @rdname dotOnUnload
-#' @name dotOnUnload
+# sharper .onLoad.
+# 
+# Function called when the sharper package is loading. 
+# 
+# @param pkgsDir package folder where the library is stored and loaded.
+# @param pkgname package name.
+# @rdname dotOnUnload
+# @name dotOnUnload
 .onUnload <- function(pkgsDir='~/R', pkgname = 'sharper') {
 
 	.C("rShutdownClr", PACKAGE = pkgname)

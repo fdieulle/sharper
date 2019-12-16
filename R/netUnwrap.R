@@ -1,5 +1,5 @@
 #' @title 
-#' Unwrap `NetObject` from `externalptr`
+#' Unwrap `NetObject` to `externalptr`
 #'
 #' @description
 #' Unwrap a `R6` `NetObject` instance to a .Net object `externalptr`.

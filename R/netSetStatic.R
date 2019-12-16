@@ -1,5 +1,5 @@
 #' @title 
-#' Sets a static property value
+#' Set static property value
 #' 
 #' @description
 #' Sets a static property value from a .Net type name

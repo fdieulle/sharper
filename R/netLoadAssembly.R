@@ -1,5 +1,5 @@
 #' @title
-#' Loads an assembly.
+#' Load assembly.
 #'
 #' @description
 #' Loads an assembly in the Clr (Common Language Runtime). 

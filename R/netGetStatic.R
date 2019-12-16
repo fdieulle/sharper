@@ -1,5 +1,5 @@
 #' @title 
-#' Gets a static property value
+#' Get static property value
 #' 
 #' @description
 #' Gets a static property value from a .Net type name

@@ -1,12 +1,12 @@
-#' @title 
-#' Gets the dotnet core installation folder
-#' 
-#' @details
-#' Gets the dotnet core installation folder.
-#' We try first to load the installation folder from the settings file.
-#' This settings file is updated by the install_dotnet_core function.
-#' If we can't found this settings we try to retreived the dotnet installation folder from the default system installation.
-#'
+# @title 
+# Gets the dotnet core installation folder
+# 
+# @details
+# Gets the dotnet core installation folder.
+# We try first to load the installation folder from the settings file.
+# This settings file is updated by the install_dotnet_core function.
+# If we can't found this settings we try to retreived the dotnet installation folder from the default system installation.
+#
 get_dotnet_core_install_folder <- function() {
 	
 	# Load settings
@@ -52,23 +52,23 @@ get_dotnet_core_install_folder <- function() {
 	return(install_folder)
 }
 
-#' @title 
-#' Gets the dotnet core runtime installation folder
-#' 
-#' @details
-#' Gets the dotnet core runtime installation folder.
-#' The runtime and the version can be specifed. For the version we apply the following heuristic:
-#' If the value 'latest' or NULL is defined we gets the latest version installed for the given runtime.
-#' Otherwise we try to match the version in this order: 
-#'	* Perfect match
-#'	* Higher Major.Minor version found
-#'  * Higher Major version found. This laste try cannot gurantee some breaking changes or other border effects.
-#'
-#' @param runtime Select the shared runtime. The possible values are:
-#' 		* `dotnet` - the `Microsoft.NETCore.App` shared runtime (default).
-#' 		* `aspnetcore` - the `Microsoft.AspNetCore.App` shared runtime.
-#' @param version Select the shared runtime version. `latest` by default. For more details see details section
-#' 
+# @title 
+# Gets the dotnet core runtime installation folder
+# 
+# @details
+# Gets the dotnet core runtime installation folder.
+# The runtime and the version can be specifed. For the version we apply the following heuristic:
+# If the value 'latest' or NULL is defined we gets the latest version installed for the given runtime.
+# Otherwise we try to match the version in this order: 
+#	* Perfect match
+#	* Higher Major.Minor version found
+#  * Higher Major version found. This laste try cannot gurantee some breaking changes or other border effects.
+#
+# @param runtime Select the shared runtime. The possible values are:
+# 		* `dotnet` - the `Microsoft.NETCore.App` shared runtime (default).
+# 		* `aspnetcore` - the `Microsoft.AspNetCore.App` shared runtime.
+# @param version Select the shared runtime version. `latest` by default. For more details see details section
+# 
 get_dotnet_core_runtime_folder <- function(runtime = "dotnet", version = "latest") {
   
 	install_folder = get_dotnet_core_install_folder()
@@ -137,10 +137,10 @@ get_dotnet_core_runtime_folder <- function(runtime = "dotnet", version = "latest
 }
 
 #' @title 
-#' Starts the dotnet core runtime from an application base directory.
+#' Start dotnet core runtime from an application base directory.
 #' 
 #' @details
-#' Starts the dotnet core runtime from an application base directory.
+#' Starts a dotnet core runtime from an application base directory.
 #' If the application base directory isn't self contained, the runtime and the version can be specifed.
 #' For the version we apply the following heuristic:
 #' If the value 'latest' or NULL is defined we gets the latest version installed for the given runtime.

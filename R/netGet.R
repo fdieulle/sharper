@@ -1,5 +1,5 @@
 #' @title 
-#' Gets property value
+#' Get property value
 #' 
 #' @description
 #' Gets a property value from a .Net object

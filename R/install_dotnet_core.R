@@ -1,5 +1,5 @@
 #' @title
-#' Install .Net core.
+#' Install .Net Core.
 #'
 #' @description
 #' Install the dotnet core runtime on your machine. 
@@ -89,12 +89,12 @@ install_dotnet_core <- function(channel = "LTS", version = "latest", installDir 
 	save_settings(settings)
 }
 
-#' @title Load package settings
-#'
-#' @description
-#' Load the package settings which is used to store mainly the dotnet core installation folder. 
-#' The settings file is stores on the package root folder.
-#'
+# @title Load package settings
+#
+# @description
+# Load the package settings which is used to store mainly the dotnet core installation folder. 
+# The settings file is stores on the package root folder.
+#
 load_settings <- function() {
 	settings_file_path <- get_settings_file_path()
 	if (file.exists(settings_file_path)) { 
@@ -104,21 +104,21 @@ load_settings <- function() {
 	}
 }
 
-#' @title Save package settings
-#'
-#' @description
-#' Save the package settings which is used to store mainly the dotnet core installation folder. 
-#' The settings file is stores on the package root folder.
-#'
+# @title Save package settings
+#
+# @description
+# Save the package settings which is used to store mainly the dotnet core installation folder. 
+# The settings file is stores on the package root folder.
+#
 save_settings <- function(settings) {
 	invisible(saveRDS(settings, file = get_settings_file_path()))
 }
 
-#' @title Gets settings file path
-#'
-#' @description
-#' Gets the settings file path.
-#'
+# @title Gets settings file path
+#
+# @description
+# Gets the settings file path.
+#
 get_settings_file_path <- function() {
 	return(file.path(system.file(package = "sharper"), "settings.rds"))
 }

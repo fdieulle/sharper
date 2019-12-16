@@ -1,5 +1,5 @@
 #' @title 
-#' Sets property value
+#' Set property value
 #' 
 #' @description
 #' Sets a property value from a .Net object

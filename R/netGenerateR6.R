@@ -1,5 +1,5 @@
 #' @title 
-#' R6 classes generator
+#' R6 class generator
 #'
 #' @description
 #' Generate R6 classes from .Net types
