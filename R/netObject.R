@@ -238,7 +238,7 @@ NetType <- R6Class(
         return(private$namespace)
       }
     },
-    #' @field Full .Net type name
+    #' @field FullName .Net type name
     FullName = function(value) {
       if (missing(value)) {
         return(private$fullName)
