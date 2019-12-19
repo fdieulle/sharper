@@ -4,11 +4,11 @@
 #' @description
 #' Call a .Net method member for a given a .Net object.
 #'
-#' @param x a .Net object, which can be an `externalptr` or a `NetObject` if `wrap` argument is set to `true`
+#' @param x a .Net object, which can be an `externalptr` or a `NetObject`.
 #' @param methodName Method name to call
 #' @param ... Method arguments
-#' @param wrap Specify if you want to wrap `externalptr` .Net object into `NetObject` `R6` object. `FALSE`` by default.
-#' @param out_env In case of .Net method with `out` or `ref` argument, 
+#' @param wrap Specify if you want to wrap `externalptr` .Net object results into `NetObject` `R6` object. `FALSE`` by default.
+#' @param out_env In case of a .Net method with `out` or `ref` argument is called, 
 #' specify on which `environment` you want to out put this arguments. 
 #' By default it's the caller `environment` i.e. `parent.frame()`.
 #' @return Returns the .Net result. 
@@ -18,21 +18,23 @@
 #' @details
 #' Call a method member for a given .Net object.
 #' Ellipses has to keep the .Net arguments method order, the named arguments are not yet supported.
-#' If there is collisions with a method name (many definition in .Net), the best matched will be chosen.
-#' A score is computed from your arguments orders and types. We consider as higher priority single value compare to collection of values.
+#' If there is conflicts with a method name (many definition in .Net), a score is computed from your argument's 
+#' order and type. We consider a higher score single value comparing to collection of values.
 #' 
-#' If you decide to set `wrap` to `TRUE` this function supports the `NetObject R6` class and all inherited.
-#' The function result if no converter has been found will return a `NetObject` of an inherited best type 
-#' instead of a raw `externalptr`. For more details about inherited `NetObject` class please see `netGenerateR6` function. 
+#' If you decide to set `wrap` to `TRUE`, the function returns a `NetObject` instead of a raw `externalptr`. 
+#' To remind an `externalptr` is returned only if no one native converter has been found.
+#' The `NetObject R6` object wrapper can be an inherited `R6` class. For more details about 
+#' inherited `NetObject` class please see `netGenerateR6` function. 
 #' 
 #' The `out_env` is usefull when the callee .Net method has some `out` or `ref` argument.
 #' Because in .Net this argument set the given variable in the caller scope. We reflect this
-#' mechanism by default by modifying the givent variables in the parent `R environment` which means
-#' the caller or `parent.frame()`. You can decide where redirect the varaibles value by specifying another argument.
+#' mechanism in R. By default the given varable is modify in the parent `R environment` which means
+#' the caller or `parent.frame()`. You can decide where to redirect the outputed value 
+#' by specifying another `environment`. Of course be sure that the variable name exists in this 
+#' targetd `environment`.
 #'
 #' @export
 #' @examples
-#' \dontrun{
 #' library(sharper)
 #'
 #' package_folder <- path.package("sharper")
@@ -44,14 +46,11 @@
 #' # wrap result
 #' x <- NetObject$new(ptr = x)
 #' clone <- netCall(x, "Clone", wrap = TRUE)
-#' print(clone)
 #' 
 #' # out a variable
 #' x <- netNew("AssemblyForTests.DefaultCtorData")
 #' out_variable = 0
 #' netCall(x, "TryGetValue", out_variable)
-#' print(out_variable)
-#' }
 netCall <- function(x, methodName, ..., wrap = FALSE, out_env = parent.frame()) {
   
   if (any(as.logical(lapply(list(...), function(x) inherits(x, "NetObject"))))) {
