@@ -35,6 +35,7 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' library(sharper)
 #'
 #' package_folder <- path.package("sharper")
@@ -51,6 +52,7 @@
 #' x <- netNew("AssemblyForTests.DefaultCtorData")
 #' out_variable = 0
 #' netCall(x, "TryGetValue", out_variable)
+#' }
 netCall <- function(x, methodName, ..., wrap = FALSE, out_env = parent.frame()) {
   
   if (any(as.logical(lapply(list(...), function(x) inherits(x, "NetObject"))))) {

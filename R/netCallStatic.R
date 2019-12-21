@@ -35,6 +35,7 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' library(sharper)
 #' 
 #' pkgPath <- path.package("sharper")
@@ -57,6 +58,7 @@
 #' # out a variable
 #' out_variable = 0
 #' netCallStatic(type, "TryGetValue", out_variable)
+#' }
 netCallStatic <- function(typeName, methodName, ..., wrap = FALSE, out_env = parent.frame()) {
   
   if (any(as.logical(lapply(list(...), function(x) inherits(x, "NetObject"))))) {

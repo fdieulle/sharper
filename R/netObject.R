@@ -1,7 +1,7 @@
 #' NetObject class
 #'
 #' @description
-#' NetObject R6 class to wrap an `externalptr``which represent a .Net object.
+#' NetObject R6 class to wrap an `externalptr``which represents a .Net object.
 #' 
 #' @md
 #' @export
@@ -47,7 +47,7 @@ NetObject <- R6Class(
     #' If you specify the `externalptr` through the `ptr` parameter, 
     #' this pointer will be wrapped and stored into the `Ptr` active binding.
     #' Otherwise if your .Net class has a default constructor you can specify the `typeName`
-    #' and a `netNew(typeName)` will be proceed to fill the `Ptr` active binding.
+    #' as `netNew(typeName)` does.
     #' 
     #' The ellipsis parameter can be use to setup the .Net properties. This feature
     #' works with both building ways.
@@ -125,7 +125,7 @@ NetObject <- R6Class(
     #' @param methodName Method name
     #' @param ... Method arguments
     #' @param wrap Specify if you want to wrap `externalptr` .Net object into `NetObject` `R6` object. `TRUE`` by default.
-    #' @param out_env In case of .Net method with `out` or `ref` argument, 
+    #' @param out_env In case of a .Net method with `out` or `ref` argument is called, 
     #' specify on which `environment` you want to out put this arguments. 
     #' By default it's the caller `environment` i.e. `parent.frame()`.
     #' @return Returns the .Net result. 
@@ -135,17 +135,20 @@ NetObject <- R6Class(
     #' @details
     #' Call a method member for a given .Net object.
     #' Ellipses has to keep the .Net arguments method order, the named arguments are not yet supported.
-    #' If there is collisions with a method name (many definition in .Net), the best matched will be chosen.
-    #' A score is computed from your arguments orders and types. We consider as higher priority single value compare to collection of values.
+    #' If there is conflicts with a method name (many definition in .Net), a score is computed from your argument's 
+    #' order and type. We consider a higher score single value comparing to collection of values.
     #' 
-    #' If you decide to set `wrap` to `TRUE` this function supports the `NetObject R6` class and all inherited.
-    #' The function result if no converter has been found will return a `NetObject` of an inherited best type 
-    #' instead of a raw `externalptr`. For more details about inherited `NetObject` class please see `netGenerateR6` function. 
+    #' If you decide to set `wrap` to `TRUE`, the function returns a `NetObject` instead of a raw `externalptr`. 
+    #' To remind an `externalptr` is returned only if no one native converter has been found.
+    #' The `NetObject R6` object wrapper can be an inherited `R6` class. For more details about 
+    #' inherited `NetObject` class please see `netGenerateR6` function. 
     #' 
     #' The `out_env` is usefull when the callee .Net method has some `out` or `ref` argument.
     #' Because in .Net this argument set the given variable in the caller scope. We reflect this
-    #' mechanism by default by modifying the givent variables in the parent `R environment` which means
-    #' the caller or `parent.frame()`. You can decide where redirect the varaibles value by specifying another argument.
+    #' mechanism in R. By default the given varable is modify in the parent `R environment` which means
+    #' the caller or `parent.frame()`. You can decide where to redirect the outputed value 
+    #' by specifying another `environment`. Of course be sure that the variable name exists in this 
+    #' targetd `environment`.
     #' 
     #' This function is aquivalent to call `netCall(o$Ptr, methodName)`.
     call = function(methodName, ..., wrap = TRUE, out_env = parent.frame()) {
@@ -259,7 +262,7 @@ NetType <- R6Class(
     #' Create a new .Net object and wrap it.
     #' @param ... Ctor arguments of the .Net type
     createObject = function(...) {
-      return (NetObject$new(ptr = netNew(private$fullName, ...)))
+      return (netWrap(netNew(private$fullName, ...)))
     }
   )
 )
