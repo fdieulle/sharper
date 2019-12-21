@@ -28,20 +28,18 @@ file.copy(files, dest, overwrite = TRUE)
 configuration = "Release"
 
 print("Publish the Sharper dotnet project")
-publish_cmd <- paste(
-	"dotnet", "publish",
-	file.path(R_PACKAGE_SOURCE, "src", "dotnet", "Sharper", "Sharper.csproj"),
-	"-o", file.path(R_PACKAGE_SOURCE, "inst", "bin"),
-	"-c", configuration, 
-	sep = " ")
-system(publish_cmd)
+publish_args <- c(
+  "publish",
+  file.path(R_PACKAGE_SOURCE, "src", "dotnet", "Sharper", "Sharper.csproj"),
+  "-o", file.path(R_PACKAGE_SOURCE, "inst", "bin"),
+  "-c", configuration)
+system2("dotnet", publish_args)
 
 print("Publish the dotnet test assembly for unit tests")
-publish_cmd <- paste(
-	"dotnet", "publish",
-	file.path(R_PACKAGE_SOURCE, "tests", "dotnet", "AssemblyForTests", "AssemblyForTests.csproj"),
-	"-o", file.path(R_PACKAGE_SOURCE, "inst", "tests"),
-	"-c", configuration, 
-	"--no-dependencies",
-	sep = " ")
-system(publish_cmd)
+publish_args <- c(
+  "publish",
+  file.path(R_PACKAGE_SOURCE, "tests", "dotnet", "AssemblyForTests", "AssemblyForTests.csproj"),
+  "-o", file.path(R_PACKAGE_SOURCE, "inst", "tests"),
+  "-c", configuration, 
+  "--no-dependencies")
+system2("dotnet", publish_args)
