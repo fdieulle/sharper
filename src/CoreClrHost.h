@@ -3,12 +3,19 @@
 
 #include "ClrHost.h"
 
+
+#if defined(_WIN32) && defined(_M_IX86)
+#define CORECLR_CALLING_CONVENTION __stdcall
+#else
+#define CORECLR_CALLING_CONVENTION
+#endif
+
 // For each hosting API, we define a function prototype and a function pointer
 // The prototype is useful for implicit linking against the dynamic coreclr
 // library and the pointer for explicit dynamic loading (dlopen, LoadLibrary)
 #define CORECLR_HOSTING_API(function, ...) \
-	extern "C" int function(__VA_ARGS__); \
-	typedef int (__stdcall *function##_ptr)(__VA_ARGS__)
+	extern "C" int CORECLR_CALLING_CONVENTION function(__VA_ARGS__); \
+	typedef int (CORECLR_CALLING_CONVENTION *function##_ptr)(__VA_ARGS__)
 
 CORECLR_HOSTING_API(coreclr_initialize,
 	const char* exePath,
@@ -55,16 +62,16 @@ CORECLR_HOSTING_API(coreclr_execute_assembly,
 #endif
 
 // Function pointer types for the managed call and callbacks
-typedef const char*(__stdcall *getLastError_ptr)();
-typedef bool (__stdcall *loadAssembly_ptr)(const char* pathOrAssemblyName);
-typedef bool (__stdcall *callStaticMethod_ptr)(const char* typeName, const char* methodName, int64_t* argsPtr, int32_t size, int64_t** results, int32_t* resultsSize);
-typedef bool (__stdcall *getStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t* value);
-typedef bool (__stdcall *setStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t value);
-typedef bool (__stdcall *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size, int64_t* value);
-typedef bool (__stdcall *releaseObject_ptr)(int64_t objPtr);
-typedef bool (__stdcall *callMethod_ptr)(int64_t objPtr, const char* methodName, int64_t* argsPtr, int32_t argsSize, int64_t** results, int32_t* resultsSize);
-typedef bool (__stdcall *getProperty_ptr)(int64_t objPtr, const char* methodName, int64_t* value);
-typedef bool (__stdcall *setProperty_ptr)(int64_t objPtr, const char* methodName, int64_t argPtr);
+typedef const char*(CORECLR_CALLING_CONVENTION *getLastError_ptr)();
+typedef bool (CORECLR_CALLING_CONVENTION *loadAssembly_ptr)(const char* pathOrAssemblyName);
+typedef bool (CORECLR_CALLING_CONVENTION *callStaticMethod_ptr)(const char* typeName, const char* methodName, int64_t* argsPtr, int32_t size, int64_t** results, int32_t* resultsSize);
+typedef bool (CORECLR_CALLING_CONVENTION *getStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t* value);
+typedef bool (CORECLR_CALLING_CONVENTION *setStaticProperty_ptr)(const char* typeName, const char* propertyName, int64_t value);
+typedef bool (CORECLR_CALLING_CONVENTION *createObject_ptr)(const char* typeName, int64_t argPtr[], int32_t size, int64_t* value);
+typedef bool (CORECLR_CALLING_CONVENTION *releaseObject_ptr)(int64_t objPtr);
+typedef bool (CORECLR_CALLING_CONVENTION *callMethod_ptr)(int64_t objPtr, const char* methodName, int64_t* argsPtr, int32_t argsSize, int64_t** results, int32_t* resultsSize);
+typedef bool (CORECLR_CALLING_CONVENTION *getProperty_ptr)(int64_t objPtr, const char* methodName, int64_t* value);
+typedef bool (CORECLR_CALLING_CONVENTION *setProperty_ptr)(int64_t objPtr, const char* methodName, int64_t argPtr);
 
 class CoreClrHost : public ClrHost
 {
