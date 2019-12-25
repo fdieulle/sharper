@@ -4,7 +4,7 @@
 - [ ] Test if the GC moves .Net objects which are shared through ExternalPtr.
 - [ ] Find a better test for disposing external ptr.
 - [ ] Check if RClrProxy.def is useless and should use only the sharper-win.def only.
-- [ ] Turn publish dotnet in Release mode
+- [x] Turn publish dotnet in Release mode
 - [ ] Assemblies lazy loading. To avoid calling `netLoadAssemblies` The `start_dotnet_clr` function should be able to define the application base directory and for .Net core can define different folder through `tpa_list` 
 - [ ] Check if this CLR supports the .Net framework. Otherwise import the cpp code from `r.net` package. and implements a FrameworkClrHost.cpp
 - [ ] Test to run a self contained application
@@ -14,6 +14,8 @@
   - [ ] install/start/stop CLR 
   - [ ] data conversions
   - [ ] How to create custom packages base on .Net assemblies
+- [ ] Add `netEvaluate` function in R package which compiles and run C# code.
+- [ ] Add `netRun` function which allows run a .Net application.
 
 #### Technical consideration
 
