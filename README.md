@@ -1,4 +1,6 @@
 # Sharper
+[![Build Status](https://api.travis-ci.com/fdieulle/sharper.svg?branch=master)](https://travis-ci.com/fdieulle/sharper)
+
 Sharper is a R package which allows to use .Net assemblies from your R environment.
 
 The goal of this package was driven by the idea to use production and industrial code implemented in .Net into a R environment, gets results in R to process statistics exploration, analysis or research.
