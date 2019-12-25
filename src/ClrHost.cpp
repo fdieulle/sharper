@@ -254,13 +254,12 @@ const char* path_expand(const char* path) {
 	char expanded_path[MAX_PATH];
 #if WINDOWS
 	int size = GetFullPathNameA(path, MAX_PATH, expanded_path, NULL);
-#elif LINUX
-	int size = realpath(path, expanded_path);
-#endif
-
 	char* result = new char[size];
 	std::strcpy(result, expanded_path);
 	return result;
+#elif LINUX
+	return realpath(path, expanded_path);
+#endif
 }
 
 const char* path_get_parent(const char* path) {
