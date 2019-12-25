@@ -25,6 +25,28 @@ print(sprintf("Copy the compiled C++ %s in %s", SHLIB_EXT, dest))
 dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
 
+arch = R_ARCH
+if(arch == "i386") {
+  arch = "x86"
+}
+
+# Check if dotnet is installed and intall it if not found
+command = "dotnet"
+if (WINDOWS) {
+  if (system2("where", "dotnet") != 0L) {
+    source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
+    install_dotnet_core(installDir = "./cli-tools", architecture = arch)
+    command = file.path("./cli-tools", arch, "dotnet.exe")
+  }
+} else {
+  if (system2("command", c("-v", "dotnet")) != 0L) {
+    source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
+    install_dotnet_core(installDir = "./cli-tools", architecture = arch)
+    command = file.path("./cli-tools", arch, "dotnet")
+  }
+}
+
+
 configuration = "Release"
 
 print("Publish the Sharper dotnet project")
