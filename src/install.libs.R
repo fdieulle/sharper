@@ -55,7 +55,7 @@ publish_args <- c(
   file.path(R_PACKAGE_SOURCE, "src", "dotnet", "Sharper", "Sharper.csproj"),
   "-o", file.path(R_PACKAGE_SOURCE, "inst", "bin"),
   "-c", configuration)
-system2("dotnet", publish_args)
+system2(command, publish_args)
 
 print("Publish the dotnet test assembly for unit tests")
 publish_args <- c(
@@ -64,4 +64,4 @@ publish_args <- c(
   "-o", file.path(R_PACKAGE_SOURCE, "inst", "tests"),
   "-c", configuration, 
   "--no-dependencies")
-system2("dotnet", publish_args)
+system2(command, publish_args)
