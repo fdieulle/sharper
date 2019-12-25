@@ -92,7 +92,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	};
 
 	// 4. Start the CoreCLR runtime and create the default (and only) AppDomain
-	HRESULT hr = _initializeCoreClr(
+	int hr = _initializeCoreClr(
 		app_base_dir_exp,        // App base path
 		"CoreClrHost",       // AppDomain friendly name
 		sizeof(propertyKeys) / sizeof(char*),   // Property count
@@ -126,7 +126,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 
 void CoreClrHost::shutdown()
 {
-	HRESULT hr = _shutdownCoreClr(_hostHandle, _domainId);
+	int hr = _shutdownCoreClr(_hostHandle, _domainId);
 
 	if (hr >= 0)
 	{
@@ -324,7 +324,7 @@ bool CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64
 
 void CoreClrHost::createManagedDelegate(const char* entryPointMethodName, void** delegate)
 {
-	HRESULT hr = _createManagedDelegate(
+	int hr = _createManagedDelegate(
 		_hostHandle,
 		_domainId,
 		"Sharper",
