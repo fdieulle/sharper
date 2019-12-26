@@ -49,6 +49,9 @@ if (has_to_install_dotnet) {
   source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
   dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet")
   install_dotnet_core(installDir = dotnet_install_folder, architecture = arch)
+  print(paste0("install done and exists: ", file.exists(file.path(dotnet_install_folder, arch, "dotnet.exe"))))
+  install_dotnet_core(installDir = "./cli-tools", architecture = arch)
+  print(paste0("install done and exists: ", file.exists("./cli-tools/x64/dotnet.exe")))
   command = file.path(dotnet_install_folder, arch, "dotnet.exe")
 }
 
