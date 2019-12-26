@@ -28,6 +28,8 @@ file.copy(files, dest, overwrite = TRUE)
 arch = R_ARCH
 if(arch == "i386") {
   arch = "x86"
+} else {
+  arch = "x64"
 }
 
 # Check if dotnet is installed and intall it if not found

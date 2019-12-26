@@ -37,7 +37,14 @@
 	libsPath <- file.path(pkgDir, "libs")
 	
 	libName <- paste0(pkgname, .Platform$dynlib.ext)
-	nativeLibPath <- file.path(libsPath, Sys.getenv('R_ARCH'), libName)
+	arch <- Sys.getenv('R_ARCH')
+	if (arch == "/i386" || arch == "i386")  {
+	  arch = "x86"
+	} else {
+	  arch = "x64"
+	} 
+	
+	nativeLibPath <- file.path(libsPath, arch, libName)
 	
 	if (file.exists(nativeLibPath)) {
 		dyn.unload(nativeLibPath)
