@@ -48,9 +48,11 @@ get_dotnet_core_install_folder <- function() {
 	# Unable to find the install folder so process an installation
 	if(is.null(install_folder) || !file.exists(install_folder)) {
 		
-	  install_folder <- file.path(path.package("sharper"), "dotnet")
+	  install_folder <- file.path(path.package("sharper"), "bin", "dotnet")
+	  print(install_folder)
 	  install_dotnet_core(installDir = install_folder, architecture = arch)
 	  install_folder <- file.path(install_folder, arch)
+	  print(install_folder)
 	} 
 	
 	return(path.expand(install_folder))
