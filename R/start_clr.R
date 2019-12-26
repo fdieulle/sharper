@@ -49,7 +49,7 @@ get_dotnet_core_install_folder <- function() {
 	if(is.null(install_folder) || !file.exists(install_folder)) {
 		
 	  install_folder <- file.path(path.package("sharper"), "dotnet")
-	  install_dotnet_core(installDir = "./cli-tools", architecture = arch)
+	  install_dotnet_core(installDir = install_folder, architecture = arch)
 	  install_folder <- file.path(install_folder, arch)
 	} 
 	
