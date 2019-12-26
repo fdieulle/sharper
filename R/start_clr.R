@@ -15,10 +15,11 @@ get_dotnet_core_install_folder <- function() {
 	
 	# Targets the good arch
 	if (arch == "/i386")  {
-		install_folder <- settings[["x86"]]
+	  arch = "x86"
 	} else if (arch == "/x64") {
-		install_folder <- settings[["x64"]]
-	} else install_folder <- NULL
+	  arch = "x64"
+	} 
+	install_folder <- settings[[arch]]
 	
 	# Try the default system install folder
 	if(is.null(install_folder) || !file.exists(install_folder)) 
@@ -44,12 +45,15 @@ get_dotnet_core_install_folder <- function() {
 		}
 	}
 	
-	# Unable to find the install folder
+	# Unable to find the install folder so process an installation
 	if(is.null(install_folder) || !file.exists(install_folder)) {
-		install_folder <- NULL
-	} else install_folder <- path.expand(install_folder)
+		
+	  install_folder <- file.path(path.package("sharper"), "dotnet")
+	  install_dotnet_core(installDir = "./cli-tools", architecture = arch)
+	  install_folder <- file.path(install_folder, arch)
+	} 
 	
-	return(install_folder)
+	return(path.expand(install_folder))
 }
 
 # @title 
@@ -166,6 +170,6 @@ start_dotnet_core_clr <- function(app_base_dir = NULL, runtime = "dotnet", versi
 		
 	package_bin_folder <- file.path(package_folder, "bin")
 	dotnet_core_folder <- as.character(get_dotnet_core_runtime_folder(runtime, version))
-
+  
 	invisible(.C("rStartClr", app_base_dir, package_bin_folder, dotnet_core_folder, PACKAGE = package_name))
 }
