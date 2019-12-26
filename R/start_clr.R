@@ -52,6 +52,7 @@ get_dotnet_core_install_folder <- function() {
 	  if (!file.exists(file.path(install_folder, arch))) {
 	    install_dotnet_core(installDir = install_folder, architecture = arch)
 	  }
+	  install_folder = file.path(install_folder, arch)
 	}
 	
 	# Unable to find the install folder
