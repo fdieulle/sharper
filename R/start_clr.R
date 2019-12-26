@@ -26,16 +26,9 @@ get_dotnet_core_install_folder <- function() {
 	{
 		install_folder<- file.path(Sys.getenv("LocalAppData"), "Microsoft", "dotnet")
 	  
-		if(file.exists(install_folder))
-		{
-			if (arch == "/i386") {
-				install_folder <- file.path(install_folder, "x86")
-			} else if (arch == "/x64") {
-				install_folder <- file.path(install_folder, "x64")
-			} else install_folder <- NULL
-		} 
-		else 
-		{
+		if(file.exists(install_folder)) {
+		  install_folder <- file.path(install_folder, arch)
+		} else {
 			os <- Sys.info()["sysname"]
 			if (os == "windows") {
 				install_folder <- "C:/Program Files/dotnet"
