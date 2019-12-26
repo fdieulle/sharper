@@ -40,8 +40,6 @@ inst
 [rR]elease
 /src/ClrHost/libs
 /LICENSE
-/man
-/NAMESPACE
 /src-x64
 /src-i386
 *.o
