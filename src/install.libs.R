@@ -32,18 +32,22 @@ if(arch == "i386") {
 
 # Check if dotnet is installed and intall it if not found
 command = "dotnet"
+has_to_install_dotnet = FALSE
 if (WINDOWS) {
   if (system2("where", "dotnet") != 0L) {
-    source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
-    install_dotnet_core(installDir = "./cli-tools", architecture = arch)
-    command = file.path("./cli-tools", arch, "dotnet.exe")
+    has_to_install_dotnet = TRUE
   }
 } else {
   if (system2("command", c("-v", "dotnet")) != 0L) {
-    source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
-    install_dotnet_core(installDir = "./cli-tools", architecture = arch)
-    command = file.path("./cli-tools", arch, "dotnet")
+    has_to_install_dotnet = TRUE
   }
+}
+
+if (has_to_install_dotnet) {
+  source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
+  dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet")
+  install_dotnet_core(installDir = dotnet_install_folder, architecture = arch)
+  command = file.path(dotnet_install_folder, arch, "dotnet.exe")
 }
 
 
