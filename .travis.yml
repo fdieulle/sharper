@@ -1,1 +1,3 @@
 language: r
+install:
+ - R -e 'devtools::document()'
