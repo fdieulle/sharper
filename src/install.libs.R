@@ -55,7 +55,7 @@ if (has_to_install_dotnet) {
     "install done and exists: ", 
     file.exists(command),
     ", command",
-    command)
+    command))
   print(list.files(dotnet_install_folder, recursive = TRUE))
 }
 
