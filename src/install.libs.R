@@ -41,7 +41,7 @@ if (WINDOWS) {
   }
 } else {
   if (system2("command", c("-v", "dotnet")) != 0L) {
-    has_to_install_dotnet = TRUE
+    #has_to_install_dotnet = TRUE
   }
 }
 
