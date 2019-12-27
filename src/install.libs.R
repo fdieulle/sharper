@@ -29,7 +29,7 @@ arch = R_ARCH
 if(arch == "i386") {
   arch = "x86"
 } else {
-  arch = "x64"
+  arch = "amd64"
 }
 
 # Check if dotnet is installed and intall it if not found
