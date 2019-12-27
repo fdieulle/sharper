@@ -3,3 +3,7 @@ addons:
  snaps:
   -name: dotnet-sdk
    classic: true
+sudo: required
+script:
+ - sudo snap alias dotnet-sdk.dotnet dotnet
+ - dotnet --version
