@@ -16,7 +16,7 @@
 #' 		* `coherent` - Latest coherent build on the channel; uses the latest stable package combination (used with Branch name `channel` options).
 #' 		* Three-part version in X.Y.Z format representing a specific build version; supersedes the -Channel option. For example: 2.0.0-preview2-006120.
 #'	If not specified, version defaults to latest.
-#' @param installDir Specifies the installation path. The directory is created if it doesn't exist. The default value is %LocalAppData%\Microsoft\dotnet. 
+#' @param installDir Specifies the installation path. The directory is created if it doesn't exist. The default value is %LocalAppData%/Microsoft/dotnet. 
 #'	Binaries are placed directly in this directory.
 #' @param architecture Architecture of the .NET Core binaries to install. Possible values are `<auto>`, `amd64`, `x64`, `x86`, `arm64`, and `arm`. The default value is `x86` and `x64`.
 #' @param runtime Installs just the shared runtime, not the entire SDK. The possible values are:

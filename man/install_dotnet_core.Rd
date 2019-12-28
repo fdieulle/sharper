@@ -26,7 +26,7 @@ The default value is \code{LTS}. For more information on \href{https://www.micro
 * Three-part version in X.Y.Z format representing a specific build version; supersedes the -Channel option. For example: 2.0.0-preview2-006120.
 If not specified, version defaults to latest.}
 
-\item{installDir}{Specifies the installation path. The directory is created if it doesn't exist. The default value is \%LocalAppData\%\Microsoft\dotnet.
+\item{installDir}{Specifies the installation path. The directory is created if it doesn't exist. The default value is \%LocalAppData\%/Microsoft/dotnet.
 Binaries are placed directly in this directory.}
 
 \item{architecture}{Architecture of the .NET Core binaries to install. Possible values are \verb{<auto>}, \code{amd64}, \code{x64}, \code{x86}, \code{arm64}, and \code{arm}. The default value is \code{x86} and \code{x64}.}
