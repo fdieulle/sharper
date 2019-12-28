@@ -301,7 +301,7 @@ bool CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64
 		std::string filename(entry->d_name);
 
 		// Check if the file has the right extension
-		int extPos = filename.size() - extLength;
+		int extPos = filename.length() - extLength;
 		if (extPos <= 0 || filename.compare(extPos, extLength, extension) != 0)
 		{
 			continue;
