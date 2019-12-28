@@ -24,11 +24,13 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	if (app_base_dir == NULL) app_base_dir = ".";
 	const char* app_base_dir_exp = path_expand(app_base_dir);
 
-	Rprintf("Setp1: \n");
+	Rprintf("Setp 1: \n");
 
 	std::string tpa_list;
 	const char* core_clr_path = get_core_clr_with_tpa_list(app_base_dir_exp, package_bin_folder, dotnet_install_path, tpa_list);
-	   
+	 
+	Rprintf("Setp 6: \n");
+
 	if (core_clr_path == NULL)
 	{
 		Rf_warning("Please install a dotnet core runtime version first.\nSee install_dotnet_core function.\n");
@@ -268,7 +270,7 @@ bool CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64
 
 	WIN32_FIND_DATAA findData;
 	HANDLE fileHandle = FindFirstFileA(searchPath.c_str(), &findData);
-
+	
 	if (fileHandle != INVALID_HANDLE_VALUE)
 	{
 		do
@@ -301,7 +303,7 @@ bool CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64
 		std::string filename(entry->d_name);
 
 		// Check if the file has the right extension
-		int extPos = filename.length() - extLength;
+		int extPos = filename.size() - extLength;
 		if (extPos <= 0 || filename.compare(extPos, extLength, extension) != 0)
 		{
 			continue;
@@ -452,13 +454,17 @@ private:
 
 	if (is_directory(app_base_dir_exp))
 	{
+		Rprintf("Setp 3.1: \n");
 		CoreClrHost::build_tpa_list(app_base_dir_exp, ".dll", tpa_list);
+		Rprintf("Setp 3.2: \n");
 		CoreClrHost::build_tpa_list(app_base_dir_exp, ".exe", tpa_list);
-
+		Rprintf("Setp 3.3: \n");
 		// Check if the app_base_dir is self contained
 		const char* core_clr = path_combine(app_base_dir_exp, CORECLR_FILE_NAME);
+		Rprintf("Setp 3.4: \n");
 		if (file_exists(core_clr))
 		{
+			Rprintf("Setp 3.5: \n");
 			delete[] app_base_dir_exp;
 			delete[] dotnet_install_path_exp;
 
