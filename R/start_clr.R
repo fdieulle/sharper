@@ -12,13 +12,10 @@ get_dotnet_core_install_folder <- function() {
 	# Load settings
 	settings <- load_settings()
 	arch <- Sys.getenv('R_ARCH')
-	print(arch)
 	
 	# Targets the good arch
 	if (arch == "/i386" || arch == "i386")  {
 	  arch = "x86"
-	} else {
-	  arch = "x64"
 	} 
 	install_folder <- settings[[arch]]
 	
