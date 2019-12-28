@@ -29,37 +29,31 @@ arch = R_ARCH
 if(arch == "i386") {
   arch = "x86"
 } else {
-  arch = "amd64"
+  arch = "x64"
 }
 
-# Check if dotnet is installed and intall it if not found
-command = "dotnet"
-has_to_install_dotnet = FALSE
+# install the dotnet sdk
+dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet", arch)
 if (WINDOWS) {
-  if (system2("where", "dotnet") != 0L) {
-    has_to_install_dotnet = TRUE
-  }
+  commandLine <- "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://dot.net/v1/dotnet-install.ps1')))"
+  arguments <- paste("-InstallDir", folder, sep = ' ')
+  system2("powershell", 
+    args = c(
+      "-NoProfile",
+      "-ExecutionPolicy", "unrestricted",
+      "-Command", 
+      paste(commandLine, arguments, sep = ' ')))
 } else {
-  if (system2("command", c("-v", "dotnet")) != 0L) {
-    #has_to_install_dotnet = TRUE
-  }
+  commandLine <- "https://dot.net/v1/dotnet-install.sh | bash /dev/stdin"
+  arguments <- paste("-InstallDir", folder, sep = ' ')
+  system2("curl", 
+    args = c(
+      "-sSL",
+      paste(commandLine, arguments, sep = ' ')))
 }
 
-if (has_to_install_dotnet) {
-  source(file.path(R_PACKAGE_SOURCE, "R", "install_dotnet_core.R"))
-  dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet")
-  install_dotnet_core(installDir = dotnet_install_folder, architecture = arch)
-  command = file.path(dotnet_install_folder, arch, "dotnet")
-  
-  print(paste0(
-    "install done and exists: ", 
-    file.exists(command),
-    ", command",
-    command))
-  print(list.files(dotnet_install_folder, recursive = TRUE))
-}
-
-
+# Build csharp projects
+command = file.path(dotnet_install_folder, "dotnet")
 configuration = "Release"
 
 print("Publish the Sharper dotnet project")
