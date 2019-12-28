@@ -18,19 +18,19 @@ print(paste0("R_ARCH: ", R_ARCH))
 print(paste0("SHLIB_EXT: ", SHLIB_EXT))
 print(paste0("WINDOWS: ", WINDOWS))
 
-# Copy the c++ dll into package dir
-files <- Sys.glob(paste0("*", SHLIB_EXT))
-dest <- file.path(R_PACKAGE_DIR, paste0('libs', R_ARCH))
-print(sprintf("Copy the compiled C++ %s in %s", SHLIB_EXT, dest))
-dir.create(dest, recursive = TRUE, showWarnings = FALSE)
-file.copy(files, dest, overwrite = TRUE)
-
 arch = R_ARCH
 if(arch == "i386") {
   arch = "x86"
 } else {
   arch = "x64"
 }
+
+# Copy the c++ dll into package dir
+files <- Sys.glob(paste0("*", SHLIB_EXT))
+dest <- file.path(R_PACKAGE_DIR, paste0('libs', arch))
+print(sprintf("Copy the compiled C++ %s in %s", SHLIB_EXT, dest))
+dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+file.copy(files, dest, overwrite = TRUE)
 
 # install the dotnet sdk
 dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet", arch)
