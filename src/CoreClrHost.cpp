@@ -46,6 +46,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	_coreClr = dlopen(core_clr_path, RTLD_NOW | RTLD_LOCAL);
 #endif
 
+	Rprintf("Setp 7: \n");
 	if (_coreClr == NULL)
 	{
 		Rf_error("Failed to load CoreCLR from %s\n", core_clr_path);
@@ -54,6 +55,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	}
 	delete[] core_clr_path;
 
+	Rprintf("Setp 8: \n");
 	// 2. Get CoreCLR hosting functions
 #if WINDOWS
 	_initializeCoreClr = (coreclr_initialize_ptr)GetProcAddress(_coreClr, "coreclr_initialize");
@@ -61,10 +63,13 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	_shutdownCoreClr = (coreclr_shutdown_ptr)GetProcAddress(_coreClr, "coreclr_shutdown");
 #elif LINUX
 	_initializeCoreClr = (coreclr_initialize_ptr)dlsym(_coreClr, "coreclr_initialize");
+	Rprintf("Setp 9: \n");
 	_createManagedDelegate = (coreclr_create_delegate_ptr)dlsym(_coreClr, "coreclr_create_delegate");
+	Rprintf("Setp 10: \n");
 	_shutdownCoreClr = (coreclr_shutdown_ptr)dlsym(_coreClr, "coreclr_shutdown");
 #endif
 
+	Rprintf("Setp 11: \n");
 	if (_initializeCoreClr == NULL)
 	{
 		Rf_error("coreclr_initialize not found");
@@ -84,7 +89,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	}
 
 	// 3. Construct properties used when starting the runtime
-
+	Rprintf("Setp 12: \n");
 	// Define CoreCLR properties
 	// Other properties related to assembly loading are common here
 	const char* propertyKeys[] = {
@@ -94,6 +99,8 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	const char* propertyValues[] = {
 		tpa_list.c_str()
 	};
+
+	Rprintf("Setp 13: \n");
 
 	// 4. Start the CoreCLR runtime and create the default (and only) AppDomain
 	int hr = _initializeCoreClr(
@@ -105,6 +112,8 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		&_hostHandle,        // Host handle
 		&_domainId); // AppDomain ID
 
+	Rprintf("Setp 14: \n");
+
 	if (hr >= 0)
 		Rprintf("CoreCLR started\n");
 	else
@@ -112,6 +121,8 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		Rf_error("coreclr_initialize failed - status: 0x%08x\n", hr);
 		return;
 	}
+
+	Rprintf("Setp 15: \n");
 
 	// 5. Create delegates to managed code to be able to invoke them
 	createManagedDelegate("GetLastError", (void**)&_getLastErrorFunc);
@@ -124,6 +135,8 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	createManagedDelegate("ReleaseObject", (void**)&(CoreClrHost::releaseObjectFunc));
 	createManagedDelegate("GetProperty", (void**)&_getFunc);
 	createManagedDelegate("SetProperty", (void**)&_setFunc);
+
+	Rprintf("Setp 16: \n");
 
 #if WINDOWS
 	delete[] app_base_dir_exp;
