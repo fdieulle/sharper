@@ -125,7 +125,9 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	createManagedDelegate("GetProperty", (void**)&_getFunc);
 	createManagedDelegate("SetProperty", (void**)&_setFunc);
 
+#if WINDOWS
 	delete[] app_base_dir_exp;
+#endif
 }
 
 void CoreClrHost::shutdown()
@@ -464,10 +466,13 @@ private:
 		Rprintf("Setp 3.4: \n");
 		if (file_exists(core_clr))
 		{
+#if WINDOWS
 			Rprintf("Setp 3.5: \n");
 			delete[] app_base_dir_exp;
+			Rprintf("Setp 3.6: \n");
 			delete[] dotnet_install_path_exp;
-
+			Rprintf("Setp 3.7: \n");
+#endif
 			return core_clr;
 		}
 	}
@@ -482,8 +487,10 @@ private:
 		{
 			CoreClrHost::build_tpa_list(dotnet_install_path_exp, ".dll", tpa_list);
 
+#if WINDOWS
 			delete[] app_base_dir_exp;
 			delete[] dotnet_install_path_exp;
+#endif
 
 			return core_clr;
 		}
@@ -491,9 +498,10 @@ private:
 
 	Rprintf("Setp 5: \n");
 
+#if WINDOWS
 	delete[] app_base_dir_exp;
 	delete[] dotnet_install_path_exp;
-
+#endif
 	return NULL;
 }
 
