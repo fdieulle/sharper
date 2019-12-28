@@ -36,7 +36,7 @@ if(arch == "i386") {
 dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet", arch)
 if (WINDOWS) {
   commandLine <- "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://dot.net/v1/dotnet-install.ps1')))"
-  arguments <- paste("-InstallDir", folder, sep = ' ')
+  arguments <- paste("-InstallDir", dotnet_install_folder, sep = ' ')
   system2("powershell", 
     args = c(
       "-NoProfile",
@@ -45,7 +45,7 @@ if (WINDOWS) {
       paste(commandLine, arguments, sep = ' ')))
 } else {
   commandLine <- "https://dot.net/v1/dotnet-install.sh | bash /dev/stdin"
-  arguments <- paste("-InstallDir", folder, sep = ' ')
+  arguments <- paste("-InstallDir", dotnet_install_folder, sep = ' ')
   system2("curl", 
     args = c(
       "-sSL",
