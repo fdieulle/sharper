@@ -24,9 +24,11 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	if (app_base_dir == NULL) app_base_dir = ".";
 	const char* app_base_dir_exp = path_expand(app_base_dir);
 
+	Rprintf("Setp1: \n");
+
 	std::string tpa_list;
 	const char* core_clr_path = get_core_clr_with_tpa_list(app_base_dir_exp, package_bin_folder, dotnet_install_path, tpa_list);
-
+	   
 	if (core_clr_path == NULL)
 	{
 		Rf_warning("Please install a dotnet core runtime version first.\nSee install_dotnet_core function.\n");
@@ -438,12 +440,16 @@ private:
 	if (is_directory(package_bin_folder))
 		CoreClrHost::build_tpa_list(package_bin_folder, ".dll", tpa_list);
 
+	Rprintf("Setp 2: \n");
+
 	const char* app_base_dir_exp = path_expand(
 		!is_directory(app_base_dir) && file_exists(app_base_dir) // If the given path is a file we get the parent folder
 			? path_get_parent(app_base_dir)
 			: app_base_dir);
 	const char* dotnet_install_path_exp = path_expand(dotnet_install_path);
 	
+	Rprintf("Setp 3: \n");
+
 	if (is_directory(app_base_dir_exp))
 	{
 		CoreClrHost::build_tpa_list(app_base_dir_exp, ".dll", tpa_list);
@@ -460,6 +466,8 @@ private:
 		}
 	}
 	
+	Rprintf("Setp 4: \n");
+
 	// Load the dotnet core dlls.
 	if (is_directory(dotnet_install_path_exp))
 	{
@@ -474,6 +482,8 @@ private:
 			return core_clr;
 		}
 	}
+
+	Rprintf("Setp 5: \n");
 
 	delete[] app_base_dir_exp;
 	delete[] dotnet_install_path_exp;
