@@ -251,14 +251,14 @@ const char* path_combine(const char* path, const char* path2) {
 const char* path_expand(const char* path) {
 	if (path == NULL) return NULL;
 	
-	char expanded_path[MAX_PATH];
 #if WINDOWS
+	char expanded_path[MAX_PATH];
 	int size = GetFullPathNameA(path, MAX_PATH, expanded_path, NULL);
 	char* result = new char[size];
 	std::strcpy(result, expanded_path);
 	return result;
 #elif LINUX
-	return realpath(path, expanded_path);
+	return realpath(path, NULL);
 #endif
 }
 
