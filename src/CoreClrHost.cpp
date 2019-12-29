@@ -100,7 +100,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		tpa_list.c_str()
 	};
 
-	Rprintf("Setp 13: \n");
+	Rprintf("Setp 13: \napp_base_dir_exp='%s'\ntpa_list=%s\n", app_base_dir_exp, tpa_list.c_str());
 
 	// 4. Start the CoreCLR runtime and create the default (and only) AppDomain
 	int hr = _initializeCoreClr(
@@ -112,7 +112,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		&_hostHandle,        // Host handle
 		&_domainId); // AppDomain ID
 
-	Rprintf("Setp 14: \n");
+	Rprintf("Setp 14: %s\n", hr);
 
 	if (hr >= 0)
 		Rprintf("CoreCLR started\n");

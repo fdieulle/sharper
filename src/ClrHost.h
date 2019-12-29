@@ -60,7 +60,7 @@ public:
 	ClrHost();
 	~ClrHost();
 
-	uint32_t getDomainId() { return _domainId; }
+	unsigned int getDomainId() { return _domainId; }
 
 	virtual void start(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path) = 0;
 	virtual void shutdown() = 0;
@@ -76,7 +76,7 @@ public:
 	void rSetProperty(SEXP p);
 
 protected:
-	uint32_t _domainId;
+	unsigned int _domainId;
 
 	virtual const char* getLastError() = 0;
 	virtual bool loadAssembly(const char* filePath) = 0;
