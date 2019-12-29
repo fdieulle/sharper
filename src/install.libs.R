@@ -26,7 +26,7 @@ dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
 
 # install the dotnet sdk
-dotnet_install_folder <- file.path(R_PACKAGE_DIR, "bin", "dotnet", R_ARCH)
+dotnet_install_folder <- file.path(R_PACKAGE_SOURCE, "cli-tools")
 if (WINDOWS) {
   commandLine <- "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -useb 'https://dot.net/v1/dotnet-install.ps1')))"
   arguments <- paste("-InstallDir", dotnet_install_folder, sep = ' ')

@@ -7,7 +7,7 @@
 #' @param typeNames a list of .Net type names
 #' @param file File path where generated types will be stored
 #' @param appendFile If the specified file already exists we append it.
-#' @param withInhritedTypes Defines if you want to generate all inherited types loaded in the clr from your specified types.
+#' @param withInheritedTypes Defines if you want to generate all inherited types loaded in the clr from your specified types.
 #' 
 #' @details
 #' It can be usefull to use this function to generate R6 classes mapped on .Net types before to build your package.

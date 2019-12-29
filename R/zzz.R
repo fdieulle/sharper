@@ -2,11 +2,11 @@
 # 
 # Function called when the sharper package is loading. 
 # 
-# @param pkgsDir package folder where the library is stored and loaded.
-# @param pkgname package name.
+# @param libname a character string giving the library directory where the package defining the namespace was found.
+# @param pkgname a character string giving the name of the package.
 # @rdname dotOnLoad
 # @name dotOnLoad
-.onLoad <- function(pkgsDir='~/R', pkgname = 'sharper') {
+.onLoad <- function(libname = '~/R', pkgname = 'sharper') {
 	pkgDir <- system.file(package = pkgname)
 	libsPath <- file.path(pkgDir, "libs")
 	
@@ -24,11 +24,11 @@
 # 
 # Function called when the sharper package is loading. 
 # 
-# @param pkgsDir package folder where the library is stored and loaded.
-# @param pkgname package name.
+# @param libname a character string giving the library directory where the package defining the namespace was found.
+# @param pkgname a character string giving the name of the package.
 # @rdname dotOnUnload
 # @name dotOnUnload
-.onUnload <- function(pkgsDir='~/R', pkgname = 'sharper') {
+.onUnload <- function(libname='~/R', pkgname = 'sharper') {
 
 	.C("rShutdownClr", PACKAGE = pkgname)
 

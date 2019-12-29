@@ -35,7 +35,7 @@ netWrap = function(ptr)
     for (r6_type_name in r6_type_names) {
       if (!is.null(r6_type_name) && exists(r6_type_name)) {
         r6_class <- get(r6_type_name)
-        if (is.R6Class(r6_class)) {
+        if (R6::is.R6Class(r6_class)) {
           return(r6_class$new(ptr = ptr))
         }
       }

@@ -84,7 +84,7 @@ netCallStatic <- function(typeName, methodName, ..., wrap = FALSE, out_env = par
 	if (length(results) > 1) {
 		args <- lapply(eval(substitute(alist(...))), deparse)
 		for (i in seq_along(args)) {
-			assign(args[[i]], results[[i + 1]], env = out_env)
+			assign(args[[i]], results[[i + 1]], envir = out_env)
 		}
 	} 
 	
