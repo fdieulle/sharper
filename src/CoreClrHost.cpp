@@ -24,13 +24,9 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	if (app_base_dir == NULL) app_base_dir = ".";
 	const char* app_base_dir_exp = path_expand(app_base_dir);
 
-	Rprintf("Setp 1: \n");
-
 	std::string tpa_list;
 	const char* core_clr_path = get_core_clr_with_tpa_list(app_base_dir_exp, package_bin_folder, dotnet_install_path, tpa_list);
 	 
-	Rprintf("Setp 6: \n");
-
 	if (core_clr_path == NULL)
 	{
 		Rf_warning("Please install a dotnet core runtime version first.\nSee install_dotnet_core function.\n");
@@ -46,7 +42,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	_coreClr = dlopen(core_clr_path, RTLD_NOW | RTLD_LOCAL);
 #endif
 
-	Rprintf("Setp 7: \n");
 	if (_coreClr == NULL)
 	{
 		Rf_error("Failed to load CoreCLR from %s\n", core_clr_path);
@@ -55,7 +50,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	}
 	delete[] core_clr_path;
 
-	Rprintf("Setp 8: \n");
 	// 2. Get CoreCLR hosting functions
 #if WINDOWS
 	_initializeCoreClr = (coreclr_initialize_ptr)GetProcAddress(_coreClr, "coreclr_initialize");
@@ -63,13 +57,10 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	_shutdownCoreClr = (coreclr_shutdown_ptr)GetProcAddress(_coreClr, "coreclr_shutdown");
 #elif LINUX
 	_initializeCoreClr = (coreclr_initialize_ptr)dlsym(_coreClr, "coreclr_initialize");
-	Rprintf("Setp 9: \n");
 	_createManagedDelegate = (coreclr_create_delegate_ptr)dlsym(_coreClr, "coreclr_create_delegate");
-	Rprintf("Setp 10: \n");
 	_shutdownCoreClr = (coreclr_shutdown_ptr)dlsym(_coreClr, "coreclr_shutdown");
 #endif
 
-	Rprintf("Setp 11: \n");
 	if (_initializeCoreClr == NULL)
 	{
 		Rf_error("coreclr_initialize not found");
@@ -89,7 +80,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	}
 
 	// 3. Construct properties used when starting the runtime
-	Rprintf("Setp 12: \n");
 	// Define CoreCLR properties
 	// Other properties related to assembly loading are common here
 	const char* propertyKeys[] = {
@@ -99,8 +89,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	const char* propertyValues[] = {
 		tpa_list.c_str()
 	};
-
-	Rprintf("Setp 13: \napp_base_dir_exp='%s'\ntpa_list='%s'\n", app_base_dir_exp, tpa_list.c_str());
 
 	// 4. Start the CoreCLR runtime and create the default (and only) AppDomain
 	int hr = _initializeCoreClr(
@@ -112,8 +100,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		&_hostHandle,        // Host handle
 		&_domainId); // AppDomain ID
 
-	Rprintf("Setp 14: %s\n", hr);
-
 	if (hr >= 0)
 		Rprintf("CoreCLR started\n");
 	else
@@ -121,8 +107,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		Rf_error("coreclr_initialize failed - status: 0x%08x\n", hr);
 		return;
 	}
-
-	Rprintf("Setp 15: \n");
 
 	// 5. Create delegates to managed code to be able to invoke them
 	createManagedDelegate("GetLastError", (void**)&_getLastErrorFunc);
@@ -135,8 +119,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	createManagedDelegate("ReleaseObject", (void**)&(CoreClrHost::releaseObjectFunc));
 	createManagedDelegate("GetProperty", (void**)&_getFunc);
 	createManagedDelegate("SetProperty", (void**)&_setFunc);
-
-	Rprintf("Setp 16: \n");
 
 	delete[] app_base_dir_exp;
 }
@@ -455,39 +437,28 @@ private:
 	if (is_directory(package_bin_folder))
 		CoreClrHost::build_tpa_list(package_bin_folder, ".dll", tpa_list);
 
-	Rprintf("Setp 2: \n");
-
 	const char* app_base_dir_exp = path_expand(
 		!is_directory(app_base_dir) && file_exists(app_base_dir) // If the given path is a file we get the parent folder
 			? path_get_parent(app_base_dir)
 			: app_base_dir);
 	const char* dotnet_install_path_exp = path_expand(dotnet_install_path);
-	
-	Rprintf("Setp 3: \n");
 
 	if (is_directory(app_base_dir_exp))
 	{
-		Rprintf("Setp 3.1: \n");
 		CoreClrHost::build_tpa_list(app_base_dir_exp, ".dll", tpa_list);
-		Rprintf("Setp 3.2: \n");
 		CoreClrHost::build_tpa_list(app_base_dir_exp, ".exe", tpa_list);
-		Rprintf("Setp 3.3: \n");
+		
 		// Check if the app_base_dir is self contained
 		const char* core_clr = path_combine(app_base_dir_exp, CORECLR_FILE_NAME);
-		Rprintf("Setp 3.4: \n");
 		if (file_exists(core_clr))
 		{
-			Rprintf("Setp 3.5: \n");
 			delete[] app_base_dir_exp;
-			Rprintf("Setp 3.6: \n");
 			delete[] dotnet_install_path_exp;
-			Rprintf("Setp 3.7: \n");
+
 			return core_clr;
 		}
 	}
 	
-	Rprintf("Setp 4: \n");
-
 	// Load the dotnet core dlls.
 	if (is_directory(dotnet_install_path_exp))
 	{
@@ -502,8 +473,6 @@ private:
 			return core_clr;
 		}
 	}
-
-	Rprintf("Setp 5: \n");
 
 	delete[] app_base_dir_exp;
 	delete[] dotnet_install_path_exp;
