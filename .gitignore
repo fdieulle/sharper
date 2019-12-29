@@ -45,3 +45,4 @@ inst
 *.o
 /src/libs
 /sharper_*.zip
+/cli-tools

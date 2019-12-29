@@ -13,7 +13,7 @@ netGenerateR6(typeNames, file, appendFile = FALSE, withInheritedTypes = FALSE)
 
 \item{appendFile}{If the specified file already exists we append it.}
 
-\item{withInhritedTypes}{Defines if you want to generate all inherited types loaded in the clr from your specified types.}
+\item{withInheritedTypes}{Defines if you want to generate all inherited types loaded in the clr from your specified types.}
 }
 \description{
 Generate R6 classes from .Net types

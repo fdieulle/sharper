@@ -22,7 +22,8 @@ package_folder <- path.package("sharper")
 netLoadAssembly(file.path(package_folder, "tests", "AssemblyForTests.dll"))
 
 netType <- NetType$new("AssemblyForTests", "ManyCtorData")
-print(sprintf("Name=\%s, Namespace=\%s, FullName=\%s", netType$Name, netType$Namespace, netType$FullName))
+print(sprintf("Name=\%s, Namespace=\%s, FullName=\%s", 
+  netType$Name, netType$Namespace, netType$FullName))
 
 object <- netType$createObject(21L)
 object$get("Id")
