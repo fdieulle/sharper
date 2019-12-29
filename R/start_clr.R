@@ -16,7 +16,9 @@ get_dotnet_core_install_folder <- function() {
 	# Targets the good arch
 	if (arch == "/i386" || arch == "i386")  {
 	  arch = "x86"
-	} 
+	} else { 
+	  arch = "x64"
+	}
 	install_folder <- settings[[arch]]
 	
 	# Try the default system install folder
