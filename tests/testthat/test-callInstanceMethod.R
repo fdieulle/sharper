@@ -1,6 +1,7 @@
 library(sharper)
 library(testthat)
 
+print("call instance methods")
 context("call instance methods")
 
 package_folder = path.package("sharper")

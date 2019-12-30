@@ -1,6 +1,7 @@
 library(sharper)
 library(testthat)
 
+print("Generate R6 classes")
 context("Generate R6 classes")
 
 package_folder <- path.package("sharper")

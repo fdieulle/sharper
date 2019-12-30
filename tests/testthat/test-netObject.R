@@ -1,6 +1,7 @@
 library(sharper)
 library(testthat)
 
+print("Wrap .Net externalptr into R6 NetObject class")
 context("Wrap .Net externalptr into R6 NetObject class")
 
 package_folder = path.package("sharper")
