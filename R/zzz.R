@@ -15,6 +15,11 @@
 	
 	if (file.exists(nativeLibPath)) 
 	{
+	  r_home = Sys.getenv("R_HOME")
+	  if (is.null(r_home) || r_home == "" || !file.exists(r_home)) {
+	    Sys.setenv(R_HOME = R.home())
+	  }
+	    
 		dyn.load(nativeLibPath)
 		start_dotnet_core_clr()
 	}
