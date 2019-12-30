@@ -56,7 +56,7 @@ if (arch == "i386")  {
 }
 
 output_bin_folder = file.path(R_PACKAGE_SOURCE, "inst", "bin", arch)
-output_test_folder = file.path(R_PACKAGE_SOURCE, "inst", "tests", arch)
+output_test_folder = file.path(R_PACKAGE_SOURCE, "inst", "tests")
 configuration = "Release"
 runtime = ifelse(WINDOWS, "win", "unix")
 
