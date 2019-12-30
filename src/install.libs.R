@@ -47,21 +47,35 @@ if (WINDOWS) {
 
 # Build csharp projects
 command = file.path(dotnet_install_folder, "dotnet")
+
+arch <- gsub("/", "", R_ARCH)
+if (arch == "i386")  {
+  arch = "x86"
+} else { 
+  arch = "x64"
+}
+
+output_bin_folder = file.path(R_PACKAGE_SOURCE, "inst", "bin", arch)
+output_test_folder = file.path(R_PACKAGE_SOURCE, "inst", "tests", arch)
 configuration = "Release"
+runtime = ifelse(WINDOWS, "win", "unix")
+
 
 print("Publish the Sharper dotnet project")
 publish_args <- c(
   "publish",
   file.path(R_PACKAGE_SOURCE, "src", "dotnet", "Sharper", "Sharper.csproj"),
-  "-o", file.path(R_PACKAGE_SOURCE, "inst", "bin"),
-  "-c", configuration)
+  "-o", output_bin_folder,
+  "-c", configuration,
+  "-r", runtime)
 system2(command, publish_args)
 
 print("Publish the dotnet test assembly for unit tests")
 publish_args <- c(
   "publish",
   file.path(R_PACKAGE_SOURCE, "tests", "dotnet", "AssemblyForTests", "AssemblyForTests.csproj"),
-  "-o", file.path(R_PACKAGE_SOURCE, "inst", "tests"),
+  "-o", output_test_folder,
   "-c", configuration, 
+  "-r", runtime,
   "--no-dependencies")
 system2(command, publish_args)

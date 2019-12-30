@@ -1,4 +1,17 @@
 # @title 
+# Gets the dotnet architecture
+#
+get_dotnet_architecture <- function() {
+  arch <- Sys.getenv('R_ARCH')
+  arch <- gsub("/", "", arch)
+  if (arch == "i386")  {
+    arch = "x86"
+  } else { 
+    arch = "x64"
+  }
+}
+
+# @title 
 # Gets the dotnet core installation folder
 # 
 # @details
@@ -11,14 +24,8 @@ get_dotnet_core_install_folder <- function() {
 	
 	# Load settings
 	settings <- load_settings()
-	arch <- Sys.getenv('R_ARCH')
+	arch <- get_dotnet_architecture()
 	
-	# Targets the good arch
-	if (arch == "/i386" || arch == "i386")  {
-	  arch = "x86"
-	} else { 
-	  arch = "x64"
-	}
 	install_folder <- settings[[arch]]
 	
 	# Try the default system install folder
@@ -167,8 +174,9 @@ start_dotnet_core_clr <- function(app_base_dir = NULL, runtime = "dotnet", versi
 
 	if (is.null(app_base_dir)) 
 		app_base_dir = package_folder
-		
-	package_bin_folder <- file.path(package_folder, "bin")
+	
+	arch = get_dotnet_architecture()
+	package_bin_folder <- file.path(package_folder, "bin", arch)
 	dotnet_core_folder <- as.character(get_dotnet_core_runtime_folder(runtime, version))
   
 	invisible(.C("rStartClr", app_base_dir, package_bin_folder, dotnet_core_folder, PACKAGE = package_name))
