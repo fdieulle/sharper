@@ -2,9 +2,9 @@ Type: Package
 Package: sharper
 Title: R interoperability with .Net Core and .Net Framework
 Version: 0.1.0
-Authors@R: c(
-	person("Fabien", "Dieulle", role = c("aut", "cre"), email = "fabien.dieulle@gmail.com")
-	)
+Authors@R: c(person("Fabien", "Dieulle", role = c("aut", "cre"), email = "fabien.dieulle@gmail.com"))
+Author: Fabien Dieulle [aut, cre]
+Maintainer: Fabien Dieulle <fabien.dieulle@gmail>
 Description: R package which provides interoperability with .Net Core and .Net Framework
 	it may usefull when you want to run .Net applications/libraries into a R environment.
 License: MIT
