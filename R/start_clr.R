@@ -17,13 +17,19 @@ get_dotnet_architecture <- function() {
 get_dotnet_core_install_folder <- function() {
 	
 	# Load settings
+  arch <- get_dotnet_architecture()
 	settings <- load_settings()
-	arch <- get_dotnet_architecture()
+	settings <- settings[names(settings) == arch]
+	if (length(settings) > 0) {
+	  install_folder <- settings[[1]]
+	} else {
+	  install_folder = NULL
+	}
 	
 	install_folder <- settings[[arch]]
 	
 	# Try the default system install folder
-	if(is.null(install_folder) || !file.exists(install_folder)) 
+	if (is.null(install_folder) || !file.exists(install_folder)) 
 	{
 		install_folder<- file.path(Sys.getenv("LocalAppData"), "Microsoft", "dotnet")
 	  
@@ -40,8 +46,8 @@ get_dotnet_core_install_folder <- function() {
 	}
 	
 	# Try or install in the package folder
-	if(is.null(install_folder) || !file.exists(install_folder)) {
-      package_folder = system.file(package = "sharper")
+	if (is.null(install_folder) || !file.exists(install_folder)) {
+    package_folder = system.file(package = "sharper")
 	  install_folder <- file.path(package_folder, "bin", "dotnet")
 	  if (!file.exists(file.path(install_folder, arch))) {
 	    install_dotnet_core(installDir = install_folder, architecture = arch)
@@ -50,7 +56,7 @@ get_dotnet_core_install_folder <- function() {
 	}
 	
 	# Unable to find the install folder
-	if(is.null(install_folder) || !file.exists(install_folder)) {
+	if (is.null(install_folder) || !file.exists(install_folder)) {
 		return (NULL)
 	} 
 	

@@ -33,15 +33,15 @@
 #' install_dotnet_core(installDir = "./", runtime = "aspnetcore")
 #' }
 install_dotnet_core <- function(channel = "LTS", version = "latest", installDir = NULL, architecture = NULL, runtime = "dotnet") {
-	pkgFolder <- system.file(package = "sharper")
 	
-	binFolder <- file.path(pkgFolder, "bin")
-	if (!file.exists(binFolder)) {
-		dir.create(binFolder, recursive = TRUE, showWarnings = FALSE)
-	}
 	if (is.null(installDir)) {
-		installDir <- file.path(Sys.getenv("LocalAppData"), "Microsoft", "dotnet")
+	  pkgFolder <- system.file(package = "sharper")
+		installDir <- file.path(pkgFolder, "bin", "dotnet")
+		if (!file.exists(installDir)) {
+		  dir.create(installDir, recursive = TRUE, showWarnings = FALSE)
+		}
 	}
+	installDir <- path.expand(installDir)
 	
 	arguments <- paste("-Channel", channel, "-Version", version, "-Runtime", runtime, "-NoPath", sep = ' ')
 	argumentsList <- list()
