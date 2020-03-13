@@ -46,8 +46,8 @@ install_dotnet_core <- function(channel = "LTS", version = "latest", installDir 
 	arguments <- paste("-Channel", channel, "-Version", version, "-Runtime", runtime, "-NoPath", sep = ' ')
 	argumentsList <- list()
 	if (is.null(architecture)) {
-		argumentsList[["x86"]] = paste(arguments, "-Architecture", "x86", sep = ' ')
-		argumentsList[["x64"]] = paste(arguments, "-Architecture", "x64", sep = ' ')
+	  arch <- gsub("/", "", Sys.getenv('R_ARCH')
+		argumentsList[[arch]] = arguments
 	} else {
 		argumentsList[[architecture]] = paste(arguments, "-Architecture", architecture, sep = ' ')
 	}
