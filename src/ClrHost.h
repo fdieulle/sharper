@@ -102,9 +102,9 @@ bool file_exists(const char* path);
 
 bool is_directory(const char* path);
 
-const char* path_combine(const char* path, const char* path2);
+void path_combine(std::string& path, const char* path2, std::string& path_combined);
 
-const char* path_expand(const char* path);
+bool path_expand(const char* path, std::string& absolute_path);
 
 const char* path_get_parent(const char* path);
 

@@ -22,33 +22,31 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 		shutdown();
 
 	if (app_base_dir == NULL) app_base_dir = ".";
-	const char* app_base_dir_exp = path_expand(app_base_dir);
+	std::string app_base_dir_exp;
+	path_expand(app_base_dir, app_base_dir_exp);
 
 	std::string tpa_list;
-	const char* core_clr_path = get_core_clr_with_tpa_list(app_base_dir_exp, package_bin_folder, dotnet_install_path, tpa_list);
-	 
-	if (core_clr_path == NULL)
+	std::string core_clr_path;
+	if (!get_core_clr_with_tpa_list(app_base_dir_exp.c_str(), package_bin_folder, dotnet_install_path, core_clr_path, tpa_list))
 	{
 		Rf_warning("Please install a dotnet core runtime version first.\nSee install_dotnet_core function.\n");
 		return;
 	}
 	
-	Rprintf("Load %s from: %s\n", CORECLR_FILE_NAME, core_clr_path);
+	Rprintf("Load %s from: %s\n", CORECLR_FILE_NAME, core_clr_path.c_str());
 
 	// 1. Load CoreCLR (coreclr.dll/libcoreclr.so)
 #if WINDOWS
-	_coreClr = LoadLibraryExA(core_clr_path, NULL, 0);
+	_coreClr = LoadLibraryExA(core_clr_path.c_str(), NULL, 0);
 #elif LINUX
-	_coreClr = dlopen(core_clr_path, RTLD_NOW | RTLD_LOCAL);
+	_coreClr = dlopen(core_clr_path.c_str(), RTLD_NOW | RTLD_LOCAL);
 #endif
 
 	if (_coreClr == NULL)
 	{
-		Rf_error("Failed to load CoreCLR from %s\n", core_clr_path);
-		delete[] core_clr_path;
+		Rf_error("Failed to load CoreCLR from %s\n", core_clr_path.c_str());
 		return;
 	}
-	delete[] core_clr_path;
 
 	// 2. Get CoreCLR hosting functions
 #if WINDOWS
@@ -92,7 +90,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 
 	// 4. Start the CoreCLR runtime and create the default (and only) AppDomain
 	int hr = _initializeCoreClr(
-		app_base_dir_exp,        // App base path
+		app_base_dir_exp.c_str(),        // App base path
 		"CoreClrHost",       // AppDomain friendly name
 		sizeof(propertyKeys) / sizeof(char*),   // Property count
 		propertyKeys,       // Property names
@@ -119,8 +117,6 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	createManagedDelegate("ReleaseObject", (void**)&(CoreClrHost::releaseObjectFunc));
 	createManagedDelegate("GetProperty", (void**)&_getFunc);
 	createManagedDelegate("SetProperty", (void**)&_setFunc);
-
-	delete[] app_base_dir_exp;
 }
 
 void CoreClrHost::shutdown()
@@ -428,55 +424,73 @@ private:
 	}
 };
 
-/*static*/ const char* CoreClrHost::get_core_clr_with_tpa_list(
+//bool CoreClrHost::get_core_clr(const char* app_base_dir, const char* dotnet_install_path, std::string& core_clr, bool& is_self_contained) {
+//	
+//	std::string app_base_dir_exp;
+//
+//	if (!is_directory(app_base_dir) && file_exists(app_base_dir))
+//		path_get_parent(app_base_dir, app_base_dir_exp);
+//	else app_base_dir_exp = app_base_dir;
+//
+//	// First try if the app base dir is self contained
+//	if (is_directory(app_base_dir_exp))
+//	{
+//
+//	}
+//}
+//
+//bool CoreClrHost::is_self_contained(const char* app_base_dir) {
+//	
+//
+//	std::string core_clr;
+//	path_combine(app_base_dir_exp, CORECLR_FILE_NAME);
+//}
+
+/*static*/ bool CoreClrHost::get_core_clr_with_tpa_list(
 	const char* app_base_dir, 
 	const char* package_bin_folder, 
 	const char* dotnet_install_path, 
+	std::string& core_clr,
 	std::string& tpa_list) {
 	
 	if (is_directory(package_bin_folder))
 		CoreClrHost::build_tpa_list(package_bin_folder, ".dll", tpa_list);
 
-	const char* app_base_dir_exp = path_expand(
+	std::string app_base_dir_exp;
+	path_expand(
 		!is_directory(app_base_dir) && file_exists(app_base_dir) // If the given path is a file we get the parent folder
 			? path_get_parent(app_base_dir)
-			: app_base_dir);
-	const char* dotnet_install_path_exp = path_expand(dotnet_install_path);
+			: app_base_dir,
+		app_base_dir_exp);
+	std::string dotnet_install_path_exp;
+	path_expand(dotnet_install_path, dotnet_install_path_exp);
 
-	if (is_directory(app_base_dir_exp))
+	if (is_directory(app_base_dir_exp.c_str()))
 	{
-		CoreClrHost::build_tpa_list(app_base_dir_exp, ".dll", tpa_list);
-		CoreClrHost::build_tpa_list(app_base_dir_exp, ".exe", tpa_list);
+		CoreClrHost::build_tpa_list(app_base_dir_exp.c_str(), ".dll", tpa_list);
+		CoreClrHost::build_tpa_list(app_base_dir_exp.c_str(), ".exe", tpa_list);
 		
 		// Check if the app_base_dir is self contained
-		const char* core_clr = path_combine(app_base_dir_exp, CORECLR_FILE_NAME);
-		if (file_exists(core_clr))
+		std::string core_clr;
+		path_combine(app_base_dir_exp, CORECLR_FILE_NAME, core_clr);
+		if (file_exists(core_clr.c_str()))
 		{
-			delete[] app_base_dir_exp;
-			delete[] dotnet_install_path_exp;
-
-			return core_clr;
+			return true;
 		}
 	}
 	
 	// Load the dotnet core dlls.
-	if (is_directory(dotnet_install_path_exp))
+	if (is_directory(dotnet_install_path_exp.c_str()))
 	{
-		const char* core_clr = path_combine(dotnet_install_path_exp, CORECLR_FILE_NAME);
-		if (file_exists(core_clr))
+		std::string core_clr;
+		path_combine(dotnet_install_path_exp, CORECLR_FILE_NAME, core_clr);
+		if (file_exists(core_clr.c_str()))
 		{
-			CoreClrHost::build_tpa_list(dotnet_install_path_exp, ".dll", tpa_list);
-
-			delete[] app_base_dir_exp;
-			delete[] dotnet_install_path_exp;
-
-			return core_clr;
+			CoreClrHost::build_tpa_list(dotnet_install_path_exp.c_str(), ".dll", tpa_list);
+			return true;
 		}
 	}
 
-	delete[] app_base_dir_exp;
-	delete[] dotnet_install_path_exp;
-
-	return NULL;
+	return false;
 }
 

@@ -50,7 +50,7 @@ namespace Sharper
                         if (string.Equals(assembly.ManifestModule.Name, assemblyName))
                             return true;
                     }
-
+                    
                     Assembly.LoadFrom(filePath);
                     return true;
                 }

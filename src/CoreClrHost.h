@@ -120,7 +120,7 @@ private:
 
 	void createManagedDelegate(const char* entryPointMethodName, void** delegate);
 	
-	static const char* get_core_clr_with_tpa_list(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path, std::string& tpa_list);
+	static bool get_core_clr_with_tpa_list(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path, std::string& core_clr, std::string& tpa_list);
 	static void build_tpa_list(const char* directory, const char* extension, std::string& tpaList);
 };
 

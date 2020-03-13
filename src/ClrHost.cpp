@@ -238,28 +238,30 @@ bool is_directory(const char* path) {
 	return false;
 }
 
-const char* path_combine(const char* path, const char* path2) {
-	std::string combined(path);
-	combined = combined.append(FS_SEPERATOR);
-	combined = combined.append(path2);
-
-	char* result = new char[combined.size()];
-	std::strcpy(result, combined.c_str());
-	return result;
+void path_combine(std::string& path, const char* path2, std::string& path_combined) {
+	path_combined.append(path);
+	path_combined.append("\\");
+	path_combined.append(path2);
 }
 
-const char* path_expand(const char* path) {
-	if (path == NULL) return NULL;
+bool path_expand(const char* path, std::string& absolute_path) {
+	if (path == NULL) return false;
 	
 #if WINDOWS
-	char expanded_path[MAX_PATH];
-	int size = GetFullPathNameA(path, MAX_PATH, expanded_path, NULL);
-	char* result = new char[size];
-	std::strcpy(result, expanded_path);
-	return result;
+	char real_path[MAX_PATH];
+	if (GetFullPathNameA(path, MAX_PATH, real_path, NULL) > 0) {
+		absolute_path.assign(real_path);
+		return true;
+	}
 #elif LINUX
-	return realpath(path, NULL);
+	char real_path[MAX_PATH];
+	if (realpath(path, real_path) != nullptr && real_path[0] != '\0') {
+		absolute_path.assign(real_path);
+		return true;
+	}
 #endif
+
+	return false;
 }
 
 const char* path_get_parent(const char* path) {
