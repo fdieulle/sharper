@@ -471,10 +471,11 @@ private:
 		CoreClrHost::build_tpa_list(app_base_dir_exp.c_str(), ".exe", tpa_list);
 		
 		// Check if the app_base_dir is self contained
-		std::string core_clr;
-		path_combine(app_base_dir_exp, CORECLR_FILE_NAME, core_clr);
-		if (file_exists(core_clr.c_str()))
+		std::string core_clr_candidate;
+		path_combine(app_base_dir_exp, CORECLR_FILE_NAME, core_clr_candidate);
+		if (file_exists(core_clr_candidate.c_str()))
 		{
+			core_clr.append(core_clr_candidate);
 			return true;
 		}
 	}
@@ -482,10 +483,11 @@ private:
 	// Load the dotnet core dlls.
 	if (is_directory(dotnet_install_path_exp.c_str()))
 	{
-		std::string core_clr;
-		path_combine(dotnet_install_path_exp, CORECLR_FILE_NAME, core_clr);
-		if (file_exists(core_clr.c_str()))
+		std::string core_clr_candidate;
+		path_combine(dotnet_install_path_exp, CORECLR_FILE_NAME, core_clr_candidate);
+		if (file_exists(core_clr_candidate.c_str()))
 		{
+			core_clr.append(core_clr_candidate);
 			CoreClrHost::build_tpa_list(dotnet_install_path_exp.c_str(), ".dll", tpa_list);
 			return true;
 		}
