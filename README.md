@@ -17,7 +17,9 @@ You can install the latest version of sharper from CRAN:
 install.packages("sharper") # Not available yet
 ```
 
-or the development version from GitHub using devtools:
+or the development version from GitHub using devtools: 
+
+If you are on linux be sure to have curl install first on your OS.
 
 ``` R
 devtools::install_github("fdieulle/sharper")
