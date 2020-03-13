@@ -29,7 +29,7 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 	std::string core_clr_path;
 	if (!get_core_clr_with_tpa_list(app_base_dir_exp.c_str(), package_bin_folder, dotnet_install_path, core_clr_path, tpa_list))
 	{
-		Rf_warning("Please install a dotnet core runtime version first.\nSee install_dotnet_core function.\n");
+		Rf_warning("Please install a dotnet core runtime version first.\nYou can use the install_dotnet_core function as:\n  install_dotnet_core()\n  start_dotnet_core_clr()");
 		return;
 	}
 	
