@@ -2,13 +2,7 @@
 # Gets the dotnet architecture
 #
 get_dotnet_architecture <- function() {
-  arch <- Sys.getenv('R_ARCH')
-  arch <- gsub("/", "", arch)
-  if (arch == "i386")  {
-    arch = "x86"
-  } else { 
-    arch = "x64"
-  }
+  return (gsub("/", "", Sys.getenv('R_ARCH')))
 }
 
 # @title 
