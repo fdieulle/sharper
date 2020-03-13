@@ -47,7 +47,7 @@ get_dotnet_core_install_folder <- function() {
 	
 	# Try or install in the package folder
 	if(is.null(install_folder) || !file.exists(install_folder)) {
-    package_folder = system.file(package = "sharper")
+      package_folder = system.file(package = "sharper")
 	  install_folder <- file.path(package_folder, "bin", "dotnet")
 	  if (!file.exists(file.path(install_folder, arch))) {
 	    install_dotnet_core(installDir = install_folder, architecture = arch)
@@ -60,7 +60,7 @@ get_dotnet_core_install_folder <- function() {
 		return (NULL)
 	} 
 	
-	return(path.expand(install_folder))
+	return (path.expand(install_folder))
 }
 
 # @title 
@@ -84,7 +84,7 @@ get_dotnet_core_runtime_folder <- function(runtime = "dotnet", version = "latest
   
 	install_folder = get_dotnet_core_install_folder()
 	if (is.null(install_folder))
-		return(NULL)
+		return (NULL)
 
 	# Build the install folder with the selected runtime
 	install_folder <- file.path(install_folder, "shared")
@@ -99,7 +99,7 @@ get_dotnet_core_runtime_folder <- function(runtime = "dotnet", version = "latest
 	# Load all installed versions and sort them
 	version_folders <- list.dirs(install_folder, full.names = FALSE, recursive = FALSE)
 	if (length(version_folders) <= 0)
-		return(NULL)
+		return (NULL)
 
 	filter_versions <- version_folders[grepl("^(\\d+\\.)?(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$", version_folders)]
 	sorted_versions <- sort(numeric_version(filter_versions))
@@ -176,7 +176,7 @@ start_dotnet_core_clr <- function(app_base_dir = NULL, runtime = "dotnet", versi
 		app_base_dir = package_folder
 	
 	arch = get_dotnet_architecture()
-	package_bin_folder <- file.path(package_folder, "bin", arch)
+	package_bin_folder <- file.path(package_folder, "bin")
 	dotnet_core_folder <- as.character(get_dotnet_core_runtime_folder(runtime, version))
   
 	invisible(.C("rStartClr", app_base_dir, package_bin_folder, dotnet_core_folder, PACKAGE = package_name))

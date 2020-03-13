@@ -20,8 +20,9 @@ print(paste0("WINDOWS: ", WINDOWS))
 
 # Copy the c++ dll into package dir
 files <- Sys.glob(paste0("*", SHLIB_EXT))
-dest <- file.path(R_PACKAGE_DIR, 'libs', R_ARCH)
-print(sprintf("Copy the compiled C++ %s in %s", SHLIB_EXT, dest))
+dest <- file.path(R_PACKAGE_DIR, 'libs', gsub("/", "", R_ARCH))
+print(sprintf("Copy the compiled C++ %s in %s", files, dest))
+print(file.exists(files))
 dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
 
@@ -48,18 +49,10 @@ if (WINDOWS) {
 # Build csharp projects
 command = file.path(dotnet_install_folder, "dotnet")
 
-arch <- gsub("/", "", R_ARCH)
-if (arch == "i386")  {
-  arch = "x86"
-} else { 
-  arch = "x64"
-}
-
-output_bin_folder = file.path(R_PACKAGE_SOURCE, "inst", "bin", arch)
+output_bin_folder = file.path(R_PACKAGE_SOURCE, "inst", "bin")
 output_test_folder = file.path(R_PACKAGE_SOURCE, "inst", "tests")
 configuration = "Release"
 runtime = ifelse(WINDOWS, "win", "unix")
-
 
 print("Publish the Sharper dotnet project")
 publish_args <- c(

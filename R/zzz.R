@@ -11,7 +11,7 @@
 	libsPath <- file.path(pkgDir, "libs")
 	
 	libName <- paste0(pkgname, .Platform$dynlib.ext)
-	nativeLibPath <- file.path(libsPath, Sys.getenv('R_ARCH'), libName)
+	nativeLibPath <- file.path(libsPath, gsub("/", "", Sys.getenv('R_ARCH')), libName)
 	
 	if (file.exists(nativeLibPath)) 
 	{
@@ -41,7 +41,7 @@
 	libsPath <- file.path(pkgDir, "libs")
 	
 	libName <- paste0(pkgname, .Platform$dynlib.ext)
-	nativeLibPath <- file.path(libsPath, Sys.getenv('R_ARCH'), libName)
+	nativeLibPath <- file.path(libsPath, gsub("/", "", Sys.getenv('R_ARCH')), libName)
 	
 	if (file.exists(nativeLibPath)) {
 		dyn.unload(nativeLibPath)

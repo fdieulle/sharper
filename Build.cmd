@@ -6,6 +6,6 @@ set RSCRIPT="%R_HOME%\bin\RScript.exe"
 
 set R="%R_HOME%\bin\R.exe"
 REM %R% CMD REMOVE "sharper"
-%R% CMD INSTALL "%cd%" --build --clean
+%R% CMD INSTALL "%cd%" --preclean
 
 pause
