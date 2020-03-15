@@ -240,7 +240,7 @@ bool is_directory(const char* path) {
 
 void path_combine(std::string& path, const char* path2, std::string& path_combined) {
 	path_combined.append(path);
-	path_combined.append("\\");
+	path_combined.append(FS_SEPERATOR);
 	path_combined.append(path2);
 }
 
