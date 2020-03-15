@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using Sharper.Converters;
 using Sharper.Converters.RDotNet;
@@ -17,6 +18,32 @@ namespace Sharper
 
         static ClrProxy()
         {
+            logger.InfoFormat("BaseDirectory: {0}", AppDomain.CurrentDomain.BaseDirectory);
+            logger.InfoFormat("DynamicDirectory: {0}", AppDomain.CurrentDomain.DynamicDirectory);
+            logger.InfoFormat("IsFullyTrusted: {0}", AppDomain.CurrentDomain.IsFullyTrusted);
+            logger.InfoFormat("IsHomogenous: {0}", AppDomain.CurrentDomain.IsHomogenous);
+            logger.InfoFormat("RelativeSearchPath: {0}", AppDomain.CurrentDomain.RelativeSearchPath);
+            logger.InfoFormat("ShadowCopyFiles: {0}", AppDomain.CurrentDomain.ShadowCopyFiles);
+            logger.InfoFormat("APPBASE: {0}", AppDomain.CurrentDomain.GetData("APPBASE"));
+            logger.InfoFormat("APP_CONFIG_FILE: {0}", AppDomain.CurrentDomain.GetData("APP_CONFIG_FILE"));
+            logger.InfoFormat("APP_LAUNCH_URL: {0}", AppDomain.CurrentDomain.GetData("APP_LAUNCH_URL"));
+            logger.InfoFormat("APP_NAME: {0}", AppDomain.CurrentDomain.GetData("APP_NAME"));
+            logger.InfoFormat("BINPATH_PROBE_ONLY: {0}", AppDomain.CurrentDomain.GetData("BINPATH_PROBE_ONLY"));
+            logger.InfoFormat("CACHE_BASE: {0}", AppDomain.CurrentDomain.GetData("CACHE_BASE"));
+            logger.InfoFormat("CODE_DOWNLOAD_DISABLED: {0}", AppDomain.CurrentDomain.GetData("CODE_DOWNLOAD_DISABLED"));
+            logger.InfoFormat("DEV_PATH: {0}", AppDomain.CurrentDomain.GetData("DEV_PATH"));
+            logger.InfoFormat("DISALLOW_APP: {0}", AppDomain.CurrentDomain.GetData("DISALLOW_APP"));
+            logger.InfoFormat("DISALLOW_APP_BASE_PROBING: {0}", AppDomain.CurrentDomain.GetData("DISALLOW_APP_BASE_PROBING"));
+            logger.InfoFormat("DISALLOW_APP_REDIRECTS: {0}", AppDomain.CurrentDomain.GetData("DISALLOW_APP_REDIRECTS"));
+            logger.InfoFormat("DYNAMIC_BASE: {0}", AppDomain.CurrentDomain.GetData("DYNAMIC_BASE"));
+            logger.InfoFormat("FORCE_CACHE_INSTALL: {0}", AppDomain.CurrentDomain.GetData("FORCE_CACHE_INSTALL"));
+            logger.InfoFormat("LICENSE_FILE: {0}", AppDomain.CurrentDomain.GetData("LICENSE_FILE"));
+            logger.InfoFormat("LOADER_OPTIMIZATION: {0}", AppDomain.CurrentDomain.GetData("LOADER_OPTIMIZATION"));
+            logger.InfoFormat("LOCATION_URI: {0}", AppDomain.CurrentDomain.GetData("LOCATION_URI"));
+            logger.InfoFormat("PRIVATE_BINPATH: {0}", AppDomain.CurrentDomain.GetData("PRIVATE_BINPATH"));
+            logger.InfoFormat("REGEX_DEFAULT_MATCH_TIMEOUT: {0}", AppDomain.CurrentDomain.GetData("REGEX_DEFAULT_MATCH_TIMEOUT"));
+            logger.InfoFormat("SHADOW_COPY_DIRS: {0}", AppDomain.CurrentDomain.GetData("SHADOW_COPY_DIRS"));
+            
             AppDomain.CurrentDomain.UnhandledException += OnException;
         }
 
