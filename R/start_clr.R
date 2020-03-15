@@ -26,8 +26,6 @@ get_dotnet_core_install_folder <- function() {
 	  install_folder = NULL
 	}
 	
-	install_folder <- settings[[arch]]
-	
 	# Try the default system install folder
 	if (is.null(install_folder) || !file.exists(install_folder)) 
 	{
@@ -50,7 +48,7 @@ get_dotnet_core_install_folder <- function() {
     package_folder = system.file(package = "sharper")
 	  install_folder <- file.path(package_folder, "bin", "dotnet")
 	  if (!file.exists(file.path(install_folder, arch))) {
-	    install_dotnet_core(installDir = install_folder, architecture = arch)
+	    install_dotnet_core(installDir = install_folder)
 	  }
 	  install_folder = file.path(install_folder, arch)
 	}
