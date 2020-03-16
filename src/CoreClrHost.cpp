@@ -23,7 +23,9 @@ void CoreClrHost::start(const char* app_base_dir, const char* package_bin_folder
 
 	if (app_base_dir == NULL) app_base_dir = ".";
 	std::string app_base_dir_exp;
-	path_expand(app_base_dir, app_base_dir_exp);
+	if (!path_expand(app_base_dir, app_base_dir_exp) || !is_directory(app_base_dir_exp.c_str())) {
+		Rf_error("App base directory doesn't exist: %s\n", app_base_dir_exp.c_str());
+	}
 
 	std::string tpa_list;
 	std::string core_clr_path;

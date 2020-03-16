@@ -43,8 +43,11 @@ namespace Sharper
             logger.InfoFormat("PRIVATE_BINPATH: {0}", AppDomain.CurrentDomain.GetData("PRIVATE_BINPATH"));
             logger.InfoFormat("REGEX_DEFAULT_MATCH_TIMEOUT: {0}", AppDomain.CurrentDomain.GetData("REGEX_DEFAULT_MATCH_TIMEOUT"));
             logger.InfoFormat("SHADOW_COPY_DIRS: {0}", AppDomain.CurrentDomain.GetData("SHADOW_COPY_DIRS"));
-            
+            logger.InfoFormat("TRUSTED_PLATFORM_ASSEMBLIES: {0}", AppDomain.CurrentDomain.GetData("TRUSTED_PLATFORM_ASSEMBLIES"));
+
             AppDomain.CurrentDomain.UnhandledException += OnException;
+	    DataConverter = new RDotNetConverter(logger);
+            
         }
 
         private static void OnException(object sender, UnhandledExceptionEventArgs e)
@@ -54,7 +57,7 @@ namespace Sharper
 
         #region Mange Data converter
 
-        public static IDataConverter DataConverter { get; set; } = new RDotNetConverter(logger);
+        public static IDataConverter DataConverter { get; private set; }
 
         #endregion
 
