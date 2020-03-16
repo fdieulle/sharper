@@ -245,77 +245,154 @@ bool CoreClrHost::setProperty(int64_t objectPtr, const char* propertyName, int64
 	return _setFunc(objectPtr, propertyName, value);
 }
 
-/*static*/ void CoreClrHost::build_tpa_list(const char* directory, const char* extension, std::string& tpaList)
+/*static*/ void CoreClrHost::build_tpa_list(const char* directory, std::string& tpaList)
 {
 #if WINDOWS
+	const char* const tpaExtensions[] = {
+		".ni.dll",
+		".dll",
+		".ni.exe",
+		".exe",
+		".ni.winmd",
+		".winmd",
+	};
 	// Win32 directory search for .dll files
+	std::set<std::string> addedAssemblies;
 
-	// This will add all files with a .dll extension to the TPA list. 
-	// This will include unmanaged assemblies (coreclr.dll, for example) that don't
-	// belong on the TPA list. In a real host, only managed assemblies that the host
-	// expects to load should be included. Having extra unmanaged assemblies doesn't
-	// cause anything to fail, though, so this function just enumerates all dll's in
-	// order to keep this sample concise.
-	std::string searchPath(directory);
-	searchPath.append(FS_SEPERATOR);
-	searchPath.append("*");
-	searchPath.append(extension);
-
-	WIN32_FIND_DATAA findData;
-	HANDLE fileHandle = FindFirstFileA(searchPath.c_str(), &findData);
-	
-	if (fileHandle != INVALID_HANDLE_VALUE)
+	for (size_t extIndex = 0; extIndex < sizeof(tpaExtensions) / sizeof(tpaExtensions[0]); extIndex++)
 	{
-		do
-		{
-			// Append the assembly to the list
-			tpaList.append(directory);
-			tpaList.append(FS_SEPERATOR);
-			tpaList.append(findData.cFileName);
-			tpaList.append(PATH_DELIMITER);
+		const char* extension = tpaExtensions[extIndex];
+		int extLength = strlen(extension);
 
-			// Note that the CLR does not guarantee which assembly will be loaded if an assembly
-			// is in the TPA list multiple times (perhaps from different paths or perhaps with different NI/NI.dll
-			// extensions. Therefore, a real host should probably add items to the list in priority order and only
-			// add a file if it's not already present on the list.
-			//
-			// For this simple sample, though, and because we're only loading TPA assemblies from a single path,
-			// and have no native images, we can ignore that complication.
-		} while (FindNextFileA(fileHandle, &findData));
-		FindClose(fileHandle);
+		// This will add all files with a .dll extension to the TPA list. 
+		// This will include unmanaged assemblies (coreclr.dll, for example) that don't
+		// belong on the TPA list. In a real host, only managed assemblies that the host
+		// expects to load should be included. Having extra unmanaged assemblies doesn't
+		// cause anything to fail, though, so this function just enumerates all dll's in
+		// order to keep this sample concise.
+		std::string searchPath(directory);
+		searchPath.append(FS_SEPERATOR);
+		searchPath.append("*");
+		searchPath.append(extension);
+
+		WIN32_FIND_DATAA findData;
+		HANDLE fileHandle = FindFirstFileA(searchPath.c_str(), &findData);
+
+		if (fileHandle != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				int extPos = strlen(findData.cFileName) - extLength;
+				std::string filename(findData.cFileName);
+				std::string filenameWithoutExt(filename.substr(0, extPos));
+
+				// Make sure if we have an assembly with multiple extensions present,
+				// we insert only one version of it.
+				if (addedAssemblies.find(filenameWithoutExt) == addedAssemblies.end())
+				{
+					addedAssemblies.insert(filenameWithoutExt);
+
+					// Append the assembly to the list
+					tpaList.append(directory);
+					tpaList.append(FS_SEPERATOR);
+					tpaList.append(findData.cFileName);
+					tpaList.append(PATH_DELIMITER);
+				}
+
+			} while (FindNextFileA(fileHandle, &findData));
+			FindClose(fileHandle);
+		}
 	}
+
 #elif LINUX
+	const char* const tpaExtensions[] = {
+		".ni.dll",
+		".dll",
+		".ni.exe",
+		".exe",
+	};
+
 	// POSIX directory search for .dll files
 	DIR* dir = opendir(directory);
-	struct dirent* entry;
-	int extLength = strlen(extension);
+	if (dir == nullptr) {
+		return;
+	}
 
-	while ((entry = readdir(dir)) != NULL)
+	std::set<std::string> addedAssemblies;
+
+	for (size_t extIndex = 0; extIndex < sizeof(tpaExtensions) / sizeof(tpaExtensions[0]); extIndex++)
 	{
-		// This simple sample doesn't check for symlinks
-		std::string filename(entry->d_name);
+		const char* ext = tpaExtensions[extIndex];
+		int extLength = strlen(ext);
 
-		// Check if the file has the right extension
-		int extPos = filename.size() - extLength;
-		if (extPos <= 0 || filename.compare(extPos, extLength, extension) != 0)
+		struct dirent* entry;
+
+		// For all entries in the directory
+		while ((entry = readdir(dir)) != nullptr)
 		{
-			continue;
+			// We are interested in files only
+			switch (entry->d_type)
+			{
+				case DT_REG:
+					break;
+
+					// Handle symlinks and file systems that do not support d_type
+				case DT_LNK:
+				case DT_UNKNOWN:
+				{
+					std::string fullFilename;
+
+					fullFilename.append(directory);
+					fullFilename.append("/");
+					fullFilename.append(entry->d_name);
+
+					struct stat sb;
+					if (stat(fullFilename.c_str(), &sb) == -1)
+					{
+						continue;
+					}
+
+					if (!S_ISREG(sb.st_mode))
+					{
+						continue;
+					}
+				}
+				break;
+
+				default:
+					continue;
+			}
+
+			std::string filename(entry->d_name);
+
+			// Check if the extension matches the one we are looking for
+			int extPos = filename.length() - extLength;
+			if ((extPos <= 0) || (filename.compare(extPos, extLength, ext) != 0))
+			{
+				continue;
+			}
+
+			std::string filenameWithoutExt(filename.substr(0, extPos));
+
+			// Make sure if we have an assembly with multiple extensions present,
+			// we insert only one version of it.
+			if (addedAssemblies.find(filenameWithoutExt) == addedAssemblies.end())
+			{
+				addedAssemblies.insert(filenameWithoutExt);
+
+				tpaList.append(directory);
+				tpaList.append("/");
+				tpaList.append(filename);
+				tpaList.append(":");
+			}
 		}
 
-		// Append the assembly to the list
-		tpaList.append(directory);
-		tpaList.append(FS_SEPERATOR);
-		tpaList.append(filename);
-		tpaList.append(PATH_DELIMITER);
-
-		// Note that the CLR does not guarantee which assembly will be loaded if an assembly
-		// is in the TPA list multiple times (perhaps from different paths or perhaps with different NI/NI.dll
-		// extensions. Therefore, a real host should probably add items to the list in priority order and only
-		// add a file if it's not already present on the list.
-		//
-		// For this simple sample, though, and because we're only loading TPA assemblies from a single path,
-		// and have no native images, we can ignore that complication.
+		// Rewind the directory stream to be able to iterate over it for the next extension
+		rewinddir(dir);
 	}
+
+	closedir(dir);
+		
 #endif
 }
 
@@ -426,28 +503,6 @@ private:
 	}
 };
 
-//bool CoreClrHost::get_core_clr(const char* app_base_dir, const char* dotnet_install_path, std::string& core_clr, bool& is_self_contained) {
-//	
-//	std::string app_base_dir_exp;
-//
-//	if (!is_directory(app_base_dir) && file_exists(app_base_dir))
-//		path_get_parent(app_base_dir, app_base_dir_exp);
-//	else app_base_dir_exp = app_base_dir;
-//
-//	// First try if the app base dir is self contained
-//	if (is_directory(app_base_dir_exp))
-//	{
-//
-//	}
-//}
-//
-//bool CoreClrHost::is_self_contained(const char* app_base_dir) {
-//	
-//
-//	std::string core_clr;
-//	path_combine(app_base_dir_exp, CORECLR_FILE_NAME);
-//}
-
 /*static*/ bool CoreClrHost::get_core_clr_with_tpa_list(
 	const char* app_base_dir, 
 	const char* package_bin_folder, 
@@ -456,7 +511,7 @@ private:
 	std::string& tpa_list) {
 	
 	if (is_directory(package_bin_folder))
-		CoreClrHost::build_tpa_list(package_bin_folder, ".dll", tpa_list);
+		CoreClrHost::build_tpa_list(package_bin_folder, tpa_list);
 
 	std::string app_base_dir_exp;
 	path_expand(
@@ -469,8 +524,7 @@ private:
 
 	if (is_directory(app_base_dir_exp.c_str()))
 	{
-		CoreClrHost::build_tpa_list(app_base_dir_exp.c_str(), ".dll", tpa_list);
-		CoreClrHost::build_tpa_list(app_base_dir_exp.c_str(), ".exe", tpa_list);
+		CoreClrHost::build_tpa_list(app_base_dir_exp.c_str(), tpa_list);
 		
 		// Check if the app_base_dir is self contained
 		std::string core_clr_candidate;
@@ -490,7 +544,7 @@ private:
 		if (file_exists(core_clr_candidate.c_str()))
 		{
 			core_clr.append(core_clr_candidate);
-			CoreClrHost::build_tpa_list(dotnet_install_path_exp.c_str(), ".dll", tpa_list);
+			CoreClrHost::build_tpa_list(dotnet_install_path_exp.c_str(), tpa_list);
 			return true;
 		}
 	}

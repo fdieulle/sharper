@@ -2,7 +2,7 @@
 #define __CORECLR_HOST_H__
 
 #include "ClrHost.h"
-
+#include <set>
 
 #if defined(_WIN32) && defined(_M_IX86)
 #define CORECLR_CALLING_CONVENTION __stdcall
@@ -121,7 +121,7 @@ private:
 	void createManagedDelegate(const char* entryPointMethodName, void** delegate);
 	
 	static bool get_core_clr_with_tpa_list(const char* app_base_dir, const char* package_bin_folder, const char* dotnet_install_path, std::string& core_clr, std::string& tpa_list);
-	static void build_tpa_list(const char* directory, const char* extension, std::string& tpaList);
+	static void build_tpa_list(const char* directory, std::string& tpaList);
 };
 
 #endif // !__CORECLR_HOST_H__
