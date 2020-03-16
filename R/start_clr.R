@@ -2,7 +2,11 @@
 # Gets the dotnet architecture
 #
 get_dotnet_architecture <- function() {
-  return (gsub("/", "", Sys.getenv('R_ARCH')))
+  arch = gsub("/", "", Sys.getenv('R_ARCH'))
+  if (arch == "i386") {
+  	  arch = "x86"
+  }
+  return (arch)
 }
 
 # @title 
@@ -173,7 +177,6 @@ start_dotnet_core_clr <- function(app_base_dir = NULL, runtime = "dotnet", versi
 	if (is.null(app_base_dir)) 
 		app_base_dir = package_folder
 	
-	arch = get_dotnet_architecture()
 	package_bin_folder <- file.path(package_folder, "bin")
 	dotnet_core_folder <- as.character(get_dotnet_core_runtime_folder(runtime, version))
   

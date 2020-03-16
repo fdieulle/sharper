@@ -46,8 +46,7 @@ namespace Sharper
             logger.InfoFormat("TRUSTED_PLATFORM_ASSEMBLIES: {0}", AppDomain.CurrentDomain.GetData("TRUSTED_PLATFORM_ASSEMBLIES"));
 
             AppDomain.CurrentDomain.UnhandledException += OnException;
-	    DataConverter = new RDotNetConverter(logger);
-            
+	        DataConverter = new RDotNetConverter(logger);
         }
 
         private static void OnException(object sender, UnhandledExceptionEventArgs e)
