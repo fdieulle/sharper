@@ -7,7 +7,7 @@
 #' @param x a .Net object, which can be an `externalptr` or a `NetObject`.
 #' @param methodName Method name to call
 #' @param ... Method arguments
-#' @param wrap Specify if you want to wrap `externalptr` .Net object results into `NetObject` `R6` object. `FALSE`` by default.
+#' @param wrap Specify if you want to wrap `externalptr` .Net object results into `NetObject` `R6` object. `FALSE` by default.
 #' @param out_env In case of a .Net method with `out` or `ref` argument is called, 
 #' specify on which `environment` you want to out put this arguments. 
 #' By default it's the caller `environment` i.e. `parent.frame()`.
@@ -26,12 +26,12 @@
 #' The `NetObject R6` object wrapper can be an inherited `R6` class. For more details about 
 #' inherited `NetObject` class please see `netGenerateR6` function. 
 #' 
-#' The `out_env` is usefull when the callee .Net method has some `out` or `ref` argument.
+#' The `out_env` is useful when the callee .Net method has some `out` or `ref` argument.
 #' Because in .Net this argument set the given variable in the caller scope. We reflect this
-#' mechanism in R. By default the given varable is modify in the parent `R environment` which means
-#' the caller or `parent.frame()`. You can decide where to redirect the outputed value 
+#' mechanism in R. By default the given variable is modify in the parent `R environment` which means
+#' the caller or `parent.frame()`. You can decide where to redirect the output value 
 #' by specifying another `environment`. Of course be sure that the variable name exists in this 
-#' targetd `environment`.
+#' targeted `environment`.
 #'
 #' @export
 #' @examples

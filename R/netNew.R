@@ -1,8 +1,8 @@
 #' @title 
-#' Instanciate a .Net object
+#' Instantiate a .Net object
 #' 
 #' @description
-#' Instanciate a .Net object from its type name.
+#' Instantiate a .Net object from its type name.
 #'
 #' @param typeName The .Net full name type
 #' @param ... .Net Constructor arguments.
