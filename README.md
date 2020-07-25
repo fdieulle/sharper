@@ -1,13 +1,13 @@
 # Sharper
 [![Build Status](https://api.travis-ci.com/fdieulle/sharper.svg?branch=master)](https://travis-ci.com/fdieulle/sharper)
 
-Sharper is a R package which allows to use .Net assemblies from your R environment.
+Sharper is a R package which allows you to execute and interact with `dotnet` assemblies from your R environment.
 
-The goal of this package was driven by the idea to use production and industrial code implemented in .Net into a R environment, gets results in R to process statistics exploration, analysis or research.
+The goal of this package was driven by the idea to use production and industrial code implemented in `dotnet` into a R environment, gets results in R to process statistics exploration, analysis or research.
 
-The package provides you tools to interact with your .Net assemblies. A large basic data conversions between R and .Net are included and the package allows you to enrich or override data converters. A part of those conversions are based on [R.Net](https://github.com/rdotnet/rdotnet) project. Thank you to the creator Jean-Michel Perraud and all contributors for this repository. 
+The package provides you tools to interact with your `dotnet` assemblies. A large basic data conversions between R and `dotnet` are included and the package allows you to enrich or override data converters. A part of those conversions are based on [R.Net](https://github.com/rdotnet/rdotnet) project. Thanks to the creator Jean-Michel Perraud and all contributors on this repository. 
 
-Because of .Net is a POO language and you need to manipulate objects in R, the package provides also a R6 class generator from .Net classes.
+R and `dotnet` have different language paradigms. R is a functional language and `dotnet` is an OOP (Oriented Object Programming). You will probably need to manipulate objects in your R environment. This is why the package also provides a `R6` class generator from `dotnet` classes.
 
 ## Installation
 
@@ -17,9 +17,9 @@ You can install the latest version of sharper from CRAN:
 install.packages("sharper") # Not available yet
 ```
 
-or the development version from GitHub using devtools: 
+or the development version from GitHub using `devtools`: 
 
-If you are on linux be sure to have curl install first on your OS.
+If you are on linux be sure to have curl installed first.
 
 ``` R
 devtools::install_github("fdieulle/sharper")
@@ -33,13 +33,17 @@ library(sharper)
 
 ### .Net Core
 
-You can install the latest .Net Core version for both environments `x86` and `x64` as follow:
+By default the package download and install a minimal `dotnet core` environment during the installation.
+
+But you can update or install other `dotnet core` version as follow:
 
 ``` R
-install_dotnetCore()
+install_dotnetCore() # Install the latest dotnet core app version
 ```
 
-Once this installation is proceed the settings choose will be save and your chosen .Net environment will be automatically loaded when the package will with `library(sharper)`
+For more details about `dotnet` version please see the [Microsoft .NET Core](https://dotnet.microsoft.com/download/dotnet-core). and also the `?install_dotnetCore` to see how to proceed.
+
+Once the installation is proceed the settings will be saved and your chosen `dotnet` environment will be automatically loaded when the package will with `library(sharper)`
 
 ## Getting started
 
@@ -81,18 +85,20 @@ To create and manage .Net objects from R you can use the following R functions:
 
 For more details about the static interactions [see](https://github.com/fdieulle/sharper/docs/net-interactions.md)
 
-To easily manipulate this .Net objects you can wrap them into a R6 class named `NetObject`. This class provides you some function as follow:
+### How to wrap .Net object into R6 class
+
+To easily manipulate this .Net objects you can wrap `dotnet` objects into a R6 base class named `NetObject`. This class provides you some function as follow:
 
 * `get`: Gets a property value
 * `set`: Sets a property value
 * `call`: Call a member method
-* `as`: Cast the current `R6Class` to another `R6Class` which has to inherit from `NetObject` by keeping the same `externalptr`.
+* `as`: Cast the current `R6Class` to another `R6Class` which has to inherit from `NetObject` by keeping the same `externalptr` (`dotnet` object pointer).
 
 For more details about the static interactions [see](https://github.com/fdieulle/sharper/docs/net-interactions.md)
 
 ### How to generate R6 classes from .Net types
 
-Because .Net is an OOP language you can have a lot of classes to use in your R scripts. The package provides you a function which generates R6 classes from .Net types.
+Because .Net is an OOP language you can have a lot of classes to use in your R scripts. The package provides you a function which automatically generates for you R6 classes from .Net types.
 
 * `netGenerateR6(typeNames, file)`: Generate R6 classes from .Net types
 
