@@ -70,7 +70,7 @@ Once your assemblies are loaded in your process you can start to interact with t
 * `netGetStatic(typeName, propertyName)`: Gets a static property value from a .Net type name
 * `netSetStatic(typeName, propertyName, value)`: Sets a static property value from a .Net type name
 
-For more details about the static interactions [see](https://github.com/fdieulle/sharper/docs/net-interactions.md)
+For more details about the static interactions [see](https://github.com/fdieulle/sharper/blob/master/docs/net-static-interactions.md)
 
 ### How to interact with .Net objects
 
@@ -83,7 +83,7 @@ To create and manage .Net objects from R you can use the following R functions:
 * `netGet`: Gets property value from a given external pointer of .Net object.
 * `netSet`: Gets property value from a given external pointer of .Net object.
 
-For more details about the static interactions [see](https://github.com/fdieulle/sharper/docs/net-interactions.md)
+For more details about the static interactions [see](https://github.com/fdieulle/sharper/blob/master/docs/net-interactions.md)
 
 ### How to wrap .Net object into R6 class
 
@@ -94,7 +94,7 @@ To easily manipulate this .Net objects you can wrap `dotnet` objects into a R6 b
 * `call`: Call a member method
 * `as`: Cast the current `R6Class` to another `R6Class` which has to inherit from `NetObject` by keeping the same `externalptr` (`dotnet` object pointer).
 
-For more details about the static interactions [see](https://github.com/fdieulle/sharper/docs/net-interactions.md)
+For more details about the static interactions [see](https://github.com/fdieulle/sharper/blob/master/docs/net-r6-interactions.md)
 
 ### How to generate R6 classes from .Net types
 
