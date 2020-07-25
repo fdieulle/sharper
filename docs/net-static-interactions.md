@@ -121,7 +121,7 @@ Sets a static property value for a given .Net type name.
 
 Allows you to set a property value from .Net type name. The input value will be converted from R type to a .Net type if a converter exists. If the property value isn't a native C# type or a mapped conversion type you have to use a wrapped `NetObject` or whichever inherited class. If none of this type cannot be provide you have to provide an external pointer on .Net object. 
 
-You can define custom converters in C# for that see [`RDotNetConverter`](https://github.com/fdieulle/sharper/docs/custom-converters.md) class.
+You can define custom converters in C# for that see [`RDotNetConverter`](https://github.com/fdieulle/sharper/blob/master/docs/custom-converters.md) class.
 
 ### Examples
 
